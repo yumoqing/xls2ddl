@@ -173,7 +173,7 @@ class CRUDData(XLSXData):
 		v = d['summary'][0]['primary']
 		v = v.split(',')
 		d['summary'][0]['primary'] = v
-		#print( "priamry=",d['summary'][0]['primary'],'type=',type(d['summary'][0]['primary']))
+		print( "priamry=",d['summary'][0]['primary'],'type=',type(d['summary'][0]['primary']))
 		d = self.convForeignkey(d)
 		d = self.convIndex(d)
 		return d
