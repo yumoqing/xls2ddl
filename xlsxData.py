@@ -152,7 +152,7 @@ class CRUDData(XLSXData):
 	@classmethod
 	def isMe(self,book):
 		sheets = book.sheets()
-		names = [ s.name.encode('utf-8') for s in sheets ]
+		names = [i.name for i in sheets ]
 		if 'summary' not in names:
 			return False
 		if 'fields' not in names:
@@ -173,7 +173,6 @@ class CRUDData(XLSXData):
 		v = d['summary'][0]['primary']
 		v = v.split(',')
 		d['summary'][0]['primary'] = v
-		print( "priamry=",d['summary'][0]['primary'],'type=',type(d['summary'][0]['primary']))
 		d = self.convForeignkey(d)
 		d = self.convIndex(d)
 		return d
@@ -222,13 +221,16 @@ class CRUDData(XLSXData):
 		nvs = []
 		for v in vs:
 			if v['oper'] == 'idx':
+				idx = {}
+				idx['name'] = v['name']
 				m = v['value']
 				des= m.split(':')
 				if len(des) != 2:
 					raise CRUDException(self.xlsxfile,'idx value format:idx_type:keylist:%s' % m)
-				v['value'] = {'idxtype':des[0],'keys':des[1].split(',')}
-			nvs.append(v)
-		data['validation'] = nvs
+				idx['idxtype'] = des[0]
+				idx['idxfields'] = des[1].split(',')
+				nvs.append(idx)
+		data['indexes'] = nvs
 		return data
 
 def xlsxFactory(xlsxfilename):
@@ -276,9 +278,6 @@ if __name__ == '__main__':
 		if ext in ['.xlsx','.xls' ]:
 			d = xlsxFactory(f)
 			data = d.read()
-			retData.update(data)
-		else:
-			data = loadf(f)
 			retData.update(data)
 	retData.update(ns)
 	print( dumps(retData))

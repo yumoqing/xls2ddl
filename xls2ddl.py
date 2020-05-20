@@ -1,3 +1,4 @@
+from traceback import print_exc
 from xlsxData import CRUDData, xlsxFactory
 
 from sqlor.ddl_template_sqlserver import sqlserver_ddl_tmpl
@@ -31,8 +32,8 @@ def model2ddl(folder,dbtype):
 		try:
 			s = xls2ddl(f,dbtype)
 			ddl_str='%s%s' % (ddl_str, s)
-		except:
-			pass
+		except Exception as e:
+			print('Exception:',e,'f=',f)
 	return ddl_str
 
 if __name__ == '__main__':
