@@ -1,6 +1,7 @@
 from traceback import print_exc
 from xlsxData import CRUDData, xlsxFactory
 
+import codecs
 import json
 from sqlor.ddl_template_sqlserver import sqlserver_ddl_tmpl
 from sqlor.ddl_template_mysql import mysql_ddl_tmpl
@@ -40,7 +41,6 @@ def model2ddl(folder,dbtype):
 		except Exception as e:
 			print('Exception:',e,'f=',f)
 			print_exc()
-	for f in listFile(folder, suffixs=['.json'])
 	return ddl_str
 
 if __name__ == '__main__':
