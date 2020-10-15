@@ -1,6 +1,7 @@
 from traceback import print_exc
 from xlsxData import CRUDData, xlsxFactory
 
+import json
 from sqlor.ddl_template_sqlserver import sqlserver_ddl_tmpl
 from sqlor.ddl_template_mysql import mysql_ddl_tmpl
 from sqlor.ddl_template_oracle import oracle_ddl_tmpl
@@ -17,8 +18,12 @@ tmpls = {
 }
 
 def xls2ddl(xlsfile,dbtype):
-	d = xlsxFactory(xlsfile)
-	data = d.read()
+	if xlsfile.endswith('json'):
+		with codecs.open(xlsfile,'r','utf-8') as f:
+			data = json.load(f)
+	else:
+		d = xlsxFactory(xlsfile)
+		data = d.read()
 	tmpl = tmpls.get(dbtype.lower())
 	if tmpl is None:
 		raise Exception('%s database not implemented' % dbtype)
@@ -28,12 +33,14 @@ def xls2ddl(xlsfile,dbtype):
 
 def model2ddl(folder,dbtype):
 	ddl_str = ''
-	for f in listFile(folder, suffixs=['xlsx']):
+	for f in listFile(folder, suffixs=['xlsx','json']):
 		try:
 			s = xls2ddl(f,dbtype)
 			ddl_str='%s%s' % (ddl_str, s)
 		except Exception as e:
 			print('Exception:',e,'f=',f)
+			print_exc()
+	for f in listFile(folder, suffixs=['.json'])
 	return ddl_str
 
 if __name__ == '__main__':
