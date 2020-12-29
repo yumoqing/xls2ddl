@@ -1,6 +1,6 @@
 import os
 import sys
-import xlrd
+from openpyxl import load_workbook
 from appPublic.myjson import loadf,dumpf,dumps
 from appPublic.dictObject import DictObject
 	
@@ -93,45 +93,42 @@ class XLSXData(object):
 		atype = type(xlsxfile) 
 		if atype == type('') or atype == type(u''):
 			self.xlsxfile = xlsxfile
-			self.book = xlrd.open_workbook(xlsxfile)
+			self.book = load_workbook(filename=xlsxfile)
 		else:
 			self.book = xlsxfile # is from Factory
 		  
-	def readRecords(self,sheet):
+	def readRecords(self,name,sheet):
 		i = 1
 		recs = []
-		name = sheet.name
-		fields = self.getFieldNames(sheet)
+		fields = []
 		tc = TypeConvert()
-		while (i < sheet.nrows):
-			j = 0
+
+		for i,row in enumerate(sheet.values):
+			if i==0:
+				fields = self.getFieldNames(row)
+				continue
 			rec = {}
-			while (j < sheet.ncols):
-				a = sheet.cell(i,j).value
-				"""
-				if type(a) == type(u''):
-					a = a.encode('utf-8')
-				"""
+			for j, a in enumerate(row):
+				if a is None:
+					continue
 				k = fields[j][0]
 				v = tc.conv(fields[j][1],a)
 				rec[k] = v
-				j += 1
+			if rec == {}:
+				continue
 			o = DictObject(**rec)
 			recs.append(o)
-			i += 1
 		return {name:recs}
 	 
 	def read(self):
 		ret = {}
-		for s in self.book.sheets():
-			ret.update(self.readRecords(s))
+		for i,s in enumerate(self.book.worksheets):
+			ret.update(self.readRecords(self.book.sheetnames[i], s))
 		return DictObject(**ret)
 
-	def getFieldNames(self,sheet):
+	def getFieldNames(self,row):
 		fs = []
-		i = 0
-		while (i < sheet.ncols):
-			f = sheet.cell(0,i).value
+		for i,f in enumerate(row):
 			if f is None:
 				f = 'F_' + str(i)
 			else:
@@ -151,8 +148,7 @@ class XLSXData(object):
 class CRUDData(XLSXData):
 	@classmethod
 	def isMe(self,book):
-		sheets = book.sheets()
-		names = [i.name for i in sheets ]
+		names = book.sheetnames
 		if 'summary' not in names:
 			return False
 		if 'fields' not in names:
@@ -242,7 +238,7 @@ def xlsxFactory(xlsxfilename):
 			if k1 is not None:
 				return k1
 			return None
-	book = xlrd.open_workbook(xlsxfilename)
+	book = load_workbook(filename=xlsxfilename)
 	k = findSubclass(book,XLSXData)
 	if k is not None:
 		return k(book)
