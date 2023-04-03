@@ -62,7 +62,7 @@ class TypeConvert:
 		cmd = "d%s" % vs[2]
 		ret=eval(cmd,{'d':data})
 		return ret
-    
+	
 	def to_xlsxdata(self,v):
 		vs = v.split('"',3)
 		if vs < 3:
@@ -78,7 +78,7 @@ class TypeConvert:
 		cmd = "d%s" % vs[2]
 		ret=eval(cmd,{'d':data})
 		return ret
-    
+	
 class CRUDException(Exception):
 	def __init__(self,xlsfile,errmsg,*args,**argv):
 		Exception.__init__(self,*args,**argv)
@@ -241,7 +241,9 @@ def xlsxFactory(xlsxfilename):
 	book = load_workbook(filename=xlsxfilename)
 	k = findSubclass(book,XLSXData)
 	if k is not None:
-		return k(book)
+		xlsx = k(book)
+		xlsx.xlsxfile = xlsxfilename
+		return xlsx
 	return XLSXData(book)
 
 def ValueConvert(s):
@@ -277,4 +279,4 @@ if __name__ == '__main__':
 			retData.update(data)
 	retData.update(ns)
 	print( dumps(retData))
-     
+	 
