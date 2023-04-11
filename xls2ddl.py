@@ -24,6 +24,8 @@ def xls2ddl(xlsfile,dbtype):
 			data = json.load(f)
 	else:
 		d = xlsxFactory(xlsfile)
+		if d is None:
+			return
 		data = d.read()
 	tmpl = tmpls.get(dbtype.lower())
 	if tmpl is None:
@@ -36,6 +38,7 @@ def model2ddl(folder,dbtype):
 	ddl_str = ''
 	for f in listFile(folder, suffixs=['xlsx','json']):
 		try:
+			ddl_str += f'-- {f}\n'
 			s = xls2ddl(f,dbtype)
 			ddl_str='%s%s' % (ddl_str, s)
 		except Exception as e:

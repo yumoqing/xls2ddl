@@ -238,13 +238,18 @@ def xlsxFactory(xlsxfilename):
 			if k1 is not None:
 				return k1
 			return None
-	book = load_workbook(filename=xlsxfilename)
-	k = findSubclass(book,XLSXData)
-	if k is not None:
-		xlsx = k(book)
-		xlsx.xlsxfile = xlsxfilename
-		return xlsx
-	return XLSXData(book)
+	try:
+		book = load_workbook(filename=xlsxfilename)
+		k = findSubclass(book,XLSXData)
+		if k is not None:
+			xlsx = k(book)
+			xlsx.xlsxfile = xlsxfilename
+			return xlsx
+		return XLSXData(book)
+
+	except Exception as e:
+		# print(xlsxfilename, 'load failed\n%s' % str(e))
+		return None
 
 def ValueConvert(s):
 	if s[:9] == 'xlsfile::':
