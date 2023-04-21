@@ -48,7 +48,13 @@ def model2ddl(folder,dbtype):
 
 if __name__ == '__main__':
 	import sys
+	##解决windows 终端中输出中文出现 
+	# UnicodeEncodeError: 'gbk' codec can't encode character '\xa0' in position 20249
+	# 错误
+	# BEGIN
 	sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
+	#
+	# END
 	if len(sys.argv) < 3:
 		print('Usage:%s dbtype folder' % sys.argv[0])
 		sys.exit(1)
