@@ -1,3 +1,6 @@
+# -*- coding:utf-8 -*-
+import io
+import sys
 from traceback import print_exc
 from xlsxData import CRUDData, xlsxFactory
 
@@ -45,6 +48,7 @@ def model2ddl(folder,dbtype):
 
 if __name__ == '__main__':
 	import sys
+	sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 	if len(sys.argv) < 3:
 		print('Usage:%s dbtype folder' % sys.argv[0])
 		sys.exit(1)
