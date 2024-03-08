@@ -91,12 +91,16 @@ class CRUDException(Exception):
 class XLSXData(object):
 	def __init__(self,xlsxfile):
 		atype = type(xlsxfile) 
-		if atype == type('') or atype == type(u''):
+		if atype == type(''):
 			self.xlsxfile = xlsxfile
 			self.book = load_workbook(filename=xlsxfile)
 		else:
 			self.book = xlsxfile # is from Factory
-		  
+		self.data = self._read()
+
+	def read(self):
+		return self.data
+
 	def readRecords(self,name,sheet):
 		i = 1
 		recs = []
@@ -120,11 +124,11 @@ class XLSXData(object):
 			recs.append(o)
 		return {name:recs}
 	 
-	def read(self):
+	def _read(self):
 		ret = {}
 		for i,s in enumerate(self.book.worksheets):
 			ret.update(self.readRecords(self.book.sheetnames[i], s))
-		return DictObject(**ret)
+		self.data = DictObject(**ret)
 
 	def getFieldNames(self,row):
 		fs = []
@@ -132,7 +136,7 @@ class XLSXData(object):
 			if f is None:
 				f = 'F_' + str(i)
 			else:
-				if type(f) != type(u""):
+				if type(f) != type(""):
 					f = 'F_' + str(f)
 				"""
 				else:
@@ -157,8 +161,9 @@ class CRUDData(XLSXData):
 			return False
 		return True
 	
-	def read(self):
-		d = XLSXData.read(self)
+	def _read(self):
+		super()._read()
+		d = self.data
 		if not 'summary' in d.keys():
 			raise CRUDException(self.xlsxfile,'summary sheet missing')
 		if not 'fields' in d.keys():
@@ -166,14 +171,44 @@ class CRUDData(XLSXData):
 		if not 'validation' in d.keys():
 			raise CRUDException(self.xlsxfile,'validation sheet missing')
 			
+		if len(d['summary']) != 1:
+			raise CRUDException(self.xlsxfile, 'Not summary or more than one summary')
+		self.convPrimary()
+		self.convForeignkey()
+		self.convIndex()
+		self.check_codes_fields()
+  
+  	def convPrimary(self):
+		d = self.data
 		v = d['summary'][0]['primary']
 		v = v.split(',')
 		d['summary'][0]['primary'] = v
-		d = self.convForeignkey(d)
-		d = self.convIndex(d)
-		return d
-  
-	def convForeignkey(self,data):
+		self.data = d
+		self.check_primary()
+		
+	def check_primary_fields(self):
+		primarys = self.data['summary'][0]['primary']
+		for p in primarys:
+			r = self.check_field(p)
+			if not r:
+				raise CRUDException(
+					self.xlsxfile, f'primary error({p})')
+	
+	def check_codes_fields(self):
+		if 'codes' not in self.data.keys():
+			return
+		for f in self.data['codes']:
+			r = self._check_field(f['field'])
+			if not r:
+				raise CRUDException(
+					self.xlsxfile, f'code definintion error({f["field"])}')
+
+
+  	def check_field(self, fieldname):
+		return filename in [f['name'] for f in self.data['fileds']]
+
+	def convForeignkey(self):
+		data = self.data
 		vs = data['validation']
 		nvs = []
 		for v in vs:
@@ -185,7 +220,7 @@ class CRUDData(XLSXData):
 				v['value'] = {'table':des[0],'value':des[1],'title':des[2]}
 			nvs.append(v)
 		data['validation'] = nvs
-		return data
+		self.data = data
  
 	def getFieldByNmae(self,fields,name):
 		for f in fields:
@@ -206,13 +241,8 @@ class CRUDData(XLSXData):
 				idxs.append(v)
 		return idxs
 
-	def isFieldExist(self,fields,name):
-		for f in fields:
-			if f['name'] == name:
-				return True
-		return False
-
-	def convIndex(self,data):
+	def convIndex(self):
+		data = self.data
 		vs = data['validation']
 		nvs = []
 		for v in vs:
@@ -225,9 +255,10 @@ class CRUDData(XLSXData):
 					raise CRUDException(self.xlsxfile,'idx value format:idx_type:keylist:%s' % m)
 				idx['idxtype'] = des[0]
 				idx['idxfields'] = des[1].split(',')
+				self.check_field(f in idx['idxfields'])
 				nvs.append(idx)
 		data['indexes'] = nvs
-		return data
+		return self.data = data
 
 def xlsxFactory(xlsxfilename):
 	def findSubclass(name,klass):
