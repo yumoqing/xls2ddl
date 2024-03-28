@@ -1,5 +1,6 @@
 import os
 import sys
+from traceback import print_exc
 from openpyxl import load_workbook
 from appPublic.myjson import loadf,dumpf,dumps
 from appPublic.dictObject import DictObject
@@ -54,8 +55,10 @@ class TypeConvert:
 		fn = vs[1]
 		d = CRUDData(fn)
 		try:
-			data = d.read()
+			data = d.get_data()
 		except Exception as e:
+			print_exc()
+			print(e)
 			return v
 		if vs[2] is None:
 			return data
@@ -70,8 +73,10 @@ class TypeConvert:
 		fn = vs[1]
 		d = XLSXData(fn)
 		try:
-			data = d.read()
+			data = d.get_data()
 		except Exception as e:
+			print_exc()
+			print(e)
 			return v
 		if vs[2] is None:
 			return data
@@ -96,9 +101,9 @@ class XLSXData(object):
 			self.book = load_workbook(filename=xlsxfile)
 		else:
 			self.book = xlsxfile # is from Factory
-		self.data = self._read()
+		self._read()
 
-	def read(self):
+	def get_data(self):
 		return self.data
 
 	def readRecords(self,name,sheet):
@@ -170,7 +175,6 @@ class CRUDData(XLSXData):
 			raise CRUDException(self.xlsxfile,'fields sheet missing')
 		if not 'validation' in d.keys():
 			raise CRUDException(self.xlsxfile,'validation sheet missing')
-			
 		if len(d['summary']) != 1:
 			raise CRUDException(self.xlsxfile, 'Not summary or more than one summary')
 		self.convPrimary()
@@ -178,16 +182,17 @@ class CRUDData(XLSXData):
 		self.convIndex()
 		self.check_codes_fields()
   
-  	def convPrimary(self):
+	def convPrimary(self):
 		d = self.data
 		v = d['summary'][0]['primary']
 		v = v.split(',')
-		d['summary'][0]['primary'] = v
-		self.data = d
-		self.check_primary()
+		self.data['summary'][0]['primary'] = v
+		self.check_primary_fields()
 		
 	def check_primary_fields(self):
 		primarys = self.data['summary'][0]['primary']
+		if primarys is None:
+			raise CRUDException(self.xlsxfile, 'primary is None')
 		for p in primarys:
 			r = self.check_field(p)
 			if not r:
@@ -198,14 +203,15 @@ class CRUDData(XLSXData):
 		if 'codes' not in self.data.keys():
 			return
 		for f in self.data['codes']:
-			r = self._check_field(f['field'])
+			r = self.check_field(f['field'])
 			if not r:
 				raise CRUDException(
-					self.xlsxfile, f'code definintion error({f["field"])}')
+					self.xlsxfile, 
+					f'code definintion error({f["field"]})')
 
 
-  	def check_field(self, fieldname):
-		return filename in [f['name'] for f in self.data['fileds']]
+	def check_field(self, fieldname):
+		return fieldname in [f['name'] for f in self.data['fields']]
 
 	def convForeignkey(self):
 		data = self.data
@@ -255,10 +261,10 @@ class CRUDData(XLSXData):
 					raise CRUDException(self.xlsxfile,'idx value format:idx_type:keylist:%s' % m)
 				idx['idxtype'] = des[0]
 				idx['idxfields'] = des[1].split(',')
-				self.check_field(f in idx['idxfields'])
+				self.check_field(f for f in idx['idxfields'])
 				nvs.append(idx)
 		data['indexes'] = nvs
-		return self.data = data
+		self.data = data
 
 def xlsxFactory(xlsxfilename):
 	def findSubclass(name,klass):
@@ -279,13 +285,14 @@ def xlsxFactory(xlsxfilename):
 		return XLSXData(book)
 
 	except Exception as e:
-		# print(xlsxfilename, 'load failed\n%s' % str(e))
+		print_exc()
+		print(xlsxfilename, 'new class failed\n%s' % str(e))
 		return None
 
 def ValueConvert(s):
 	if s[:9] == 'xlsfile::':
 		d = xlsxFactory(s[9:])
-		return d.read()
+		return d.get_data()
 	if s[:10] == 'jsonfile::':
 		return loadf(s[10:])
 	return s
@@ -311,7 +318,7 @@ if __name__ == '__main__':
 		ext = os.path.splitext(f)[-1]
 		if ext in ['.xlsx','.xls' ]:
 			d = xlsxFactory(f)
-			data = d.read()
+			data = d.get_data()
 			retData.update(data)
 	retData.update(ns)
 	print( dumps(retData))

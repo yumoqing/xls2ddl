@@ -22,14 +22,19 @@ tmpls = {
 }
 
 def xls2ddl(xlsfile,dbtype):
+	data = None
 	if xlsfile.endswith('json'):
 		with codecs.open(xlsfile,'r','utf-8') as f:
 			data = json.load(f)
 	else:
 		d = xlsxFactory(xlsfile)
 		if d is None:
+			print(xlsfile, 'can not read data')
 			return
-		data = d.read()
+		data = d.get_data()
+	if data is None:
+		print(xlsfile, 'not data return from XLSX file')
+		return
 	tmpl = tmpls.get(dbtype.lower())
 	if tmpl is None:
 		raise Exception('%s database not implemented' % dbtype)
