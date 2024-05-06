@@ -4,17 +4,16 @@ data_browser_tmpl = """
     "options":{
 		"title":"{{tblname}}",
 		"editable":{
-			"form_cheight":4,
-			"new_data_url":{%- raw -%}"{{entire_url('add_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw -%}
-			"delete_data_url":{%- raw -%}"{{entire_url('delete_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw -%}
-			"update_data_url":{%- raw -%}"{{entire_url('update_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}"{%- endraw -%}
+			"new_data_url":{%- raw -%}"{{entire_url('add_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
+			"delete_data_url":{%- raw -%}"{{entire_url('delete_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
+			"update_data_url":{%- raw -%}"{{entire_url('update_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}"{%- endraw %}
 		},
 
-        "data_url":"{%- raw -%}{{entire_url('./get_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw -%}
+        "data_url":"{%- raw -%}{{entire_url('./get_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
         "record_view":{
             "widgettype":"DataRow",
             "options":{
-                "fields":{{fields}},
+                "fields":{{fieldlist}},
                 "height":"100%"
             },  
         },  
@@ -38,6 +37,8 @@ async with db.sqlorContext('{{dbname}}') as sor:
     r = await sor.sqlPaging(sql, ns) 
     return r
 return {
+	"total":0,
+	"rows":[]
 }
 """
 data_new_tmpl = """

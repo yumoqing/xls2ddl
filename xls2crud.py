@@ -33,7 +33,7 @@ def build_table_crud_ui(uidir: str, dbname: str, tblname:str, desc: dict):
 	build_data_delete(pat, dbname, tblname, desc)
 	build_get_data(pat, dbname, tblname, desc)
 
-def field_list(desc: dict) -> str:
+def field_list(desc: dict) -> list:
 	fs = []
 	for f in desc.fields:
 		if desc.codes and f.name in [c.field for c in desc.codes]:
@@ -42,6 +42,7 @@ def field_list(desc: dict) -> str:
 		else:
 			d = setup_ui_info(f)
 			fs.append(d)
+	return fs
 
 def get_code_desc(field: dict, desc: dict) -> dict:
 	d = DictObject(**field.copy())
@@ -65,26 +66,40 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 
 def setup_ui_info(field:dict) ->dict:
 	d = DictObject(**field.copy())
+	if d.length:
+		d.cwidth = d.length if d.length < 40 else 40
+	else:
+		d.length = 0
+
 	if d.type == 'date':
 		d.uitype = 'date'
+		d.length = 0
 	elif d.type == 'time':
 		d.uitype = 'time'
+		d.length = 0
 	elif d.type in ['int', 'short', 'long', 'longlong']:
 		d.uitype = 'int'
+		d.length = 0
 	elif d.type in ['float', 'double', 'decimal']:
 		d.uitype = 'float'
 	else:
 		if d.name.endswith('_date') or d.name.endswith('_dat'):
 			d.uitype = 'date'
-	d.cwidth = d.length if dlength < 40 else 40
+			d.length = 0
+		elif d.name in ['password', 'passwd']:
+			d.uitype = 'password'
+		else:
+			d.uitype = 'str'
 	d.datatype = d.type
+	d.label = d.title or d.name
+	d.value = "${" + d.name + "}"
 	return d
 
 def construct_get_data_sql(desc: dict) -> str:
 	shortnames = [c for c in 'bcdefghjklmnopqrstuvwxyz']
 	infos = []
 	if not desc.codes:
-		return f"select * from desc.summary[0].name"
+		return f"select * from {desc.summary[0].name}"
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
@@ -110,9 +125,10 @@ where {conds}"""
 		addonfields = ', ' + addonfields
 	
 def build_data_browser(pat: str, dbname:str, tblname: str, desc: dict):
-	e = MyTemplateEngine([])
 	desc = desc.copy()
 	desc.dbname = dbname
+	desc.fieldlist = field_list(desc)
+	e = MyTemplateEngine([])
 	s = e.renders(data_browser_tmpl, desc)
 	with open(os.path.join(pat, f'{tblname}.ui'), 'w') as f:
 		f.write(s)
