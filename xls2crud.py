@@ -67,7 +67,10 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 def setup_ui_info(field:dict) ->dict:
 	d = DictObject(**field.copy())
 	if d.length:
-		d.cwidth = d.length if d.length < 40 else 40
+		d.cwidth = d.length if d.length < 18 else 18
+		if (d.cwidth < 4){
+			d.cwidth = 4;
+		}
 	else:
 		d.length = 0
 
@@ -92,7 +95,6 @@ def setup_ui_info(field:dict) ->dict:
 			d.uitype = 'str'
 	d.datatype = d.type
 	d.label = d.title or d.name
-	d.value = "${" + d.name + "}"
 	return d
 
 def construct_get_data_sql(desc: dict) -> str:
@@ -106,14 +108,12 @@ def construct_get_data_sql(desc: dict) -> str:
 		cond = '1 = 1'
 		if c.cond:
 			cond = c.cond
-		print(f'{c=}')
 		csql = f"""(select {c.valuefield} as {c.field}, 
 			{c.textfield} as {c.field}_text from {c.table} where {cond})"""
 		infos.append([shortname, f'{shortname}.{c.field}_text', csql, f"a.{c.field} = {shortname}.{c.valuefield}"])
 	if len(infos) == 0:
 		return f"select * from {desc.summary[0].name}"
 	infos.append(['a', 'a.*', desc.summary[0].name, None]) 
-	print(infos)
 	fields = ', '.join([i[1] for i in infos])
 	tables = ', '.join([i[2] + ' ' + i[0] for i in infos])
 	conds = ' and '.join([i[3] for i in infos if i[3] is not None])
@@ -153,7 +153,7 @@ def build_data_delete(pat: str, dbname:str, tblname: str, desc: dict):
 	e = MyTemplateEngine([])
 	desc = desc.copy()
 	desc.dbname = dbname
-	s = e.renders(data_update_tmpl, desc)
+	s = e.renders(data_delete_tmpl, desc)
 	with open(os.path.join(pat, f'delete_{tblname}.dspy'), 'w') as f:
 		f.write(s)
 

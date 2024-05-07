@@ -47,7 +47,7 @@ id = uuid()
 ns['id'] = id
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
-    r = await sor.C('{{tblname}}', ns)
+    r = await sor.C('{{summary[0].name}}', ns)
     return {
         "widgettype":"Message",
         "options":{
@@ -68,7 +68,7 @@ data_update_tmpl = """
 ns = params_kw.copy()
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
-    r = await sor.U('{{tblname}}', ns)
+    r = await sor.U('{{summary[0].name}}', ns)
     print('update success');
     return {
         "widgettype":"Message",
@@ -94,7 +94,7 @@ ns = {
 }
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
-    r = await sor.U('{{tblname}}', ns)
+    r = await sor.D('{{summary[0].name}}', ns)
     print('delete success');
     return {
         "widgettype":"Message",
