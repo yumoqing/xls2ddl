@@ -13,8 +13,7 @@ data_browser_tmpl = """
         "record_view":{
             "widgettype":"DataRow",
             "options":{
-                "fields":{{fieldlist}},
-                "height":"100%"
+                "fields":{{fieldlist}}
             },  
         },  
         "page_rows":800,
