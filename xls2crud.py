@@ -1,5 +1,7 @@
 import os
 import sys
+import codecs
+import json
 from appPublic.dictObject import DictObject
 from xlsxData import xlsxFactory
 from appPublic.folderUtils import listFile, _mkdir
@@ -20,18 +22,23 @@ def build_dbdesc(models_dir: str) -> dict:
 		db_desc.update({tbname:d})
 	return db_desc
 
-def build_crud_ui(uidir: str, dbname, dbdesc):
-	for tblname, desc in dbdesc.items():
-		build_table_crud_ui(uidir, dbname, tblname, desc)
+def build_crud_ui(crud_data: dict, dbdesc: dict):
+	uidir = crud_data.output_dir
+	desc = dbdesc[crud_data.tblname]
+	desc.update(crud_data.params)
+	desc.update({
+		"tblname":crud_data.tblname,
+		"dbname":crud_data.dbname
+	})
+	build_table_crud_ui(uidir, desc)
 
-def build_table_crud_ui(uidir: str, dbname: str, tblname:str, desc: dict):
-	pat = os.path.join(uidir, tblname)
-	_mkdir(pat)
-	build_data_browser(pat, dbname, tblname, desc)
-	build_data_new(pat, dbname, tblname, desc)
-	build_data_update(pat, dbname, tblname, desc)
-	build_data_delete(pat, dbname, tblname, desc)
-	build_get_data(pat, dbname, tblname, desc)
+def build_table_crud_ui(uidir: str, desc: dict) -> None:
+	_mkdir(uidir)
+	build_data_browser(uidir, desc)
+	build_data_new(uidir, desc)
+	build_data_update(uidir, desc)
+	build_data_delete(uidir, desc)
+	build_get_data(uidir, desc)
 
 def field_list(desc: dict) -> list:
 	fs = []
@@ -68,9 +75,8 @@ def setup_ui_info(field:dict) ->dict:
 	d = DictObject(**field.copy())
 	if d.length:
 		d.cwidth = d.length if d.length < 18 else 18
-		if (d.cwidth < 4){
+		if d.cwidth < 4:
 			d.cwidth = 4;
-		}
 	else:
 		d.length = 0
 
@@ -124,55 +130,63 @@ where {conds}"""
 	if len(addonfields) > 0:
 		addonfields = ', ' + addonfields
 	
-def build_data_browser(pat: str, dbname:str, tblname: str, desc: dict):
+def build_data_browser(pat: str, desc: dict):
 	desc = desc.copy()
-	desc.dbname = dbname
 	desc.fieldlist = field_list(desc)
 	e = MyTemplateEngine([])
 	s = e.renders(data_browser_tmpl, desc)
-	with open(os.path.join(pat, f'{tblname}.ui'), 'w') as f:
+	with open(os.path.join(pat, f'index.ui'), 'w') as f:
 		f.write(s)
 
-def build_data_new(pat: str, dbname:str, tblname: str, desc: dict):
+def build_data_new(pat: str, desc: dict):
 	e = MyTemplateEngine([])
 	desc = desc.copy()
-	desc.dbname = dbname
 	s = e.renders(data_new_tmpl, desc)
-	with open(os.path.join(pat, f'add_{tblname}.dspy'), 'w') as f:
+	with open(os.path.join(pat, f'add_{desc.tblname}.dspy'), 'w') as f:
 		f.write(s)
 
-def build_data_update(pat: str, dbname:str, tblname: str, desc: dict):
+def build_data_update(pat: str, desc: dict):
 	e = MyTemplateEngine([])
 	desc = desc.copy()
-	desc.dbname = dbname
 	s = e.renders(data_update_tmpl, desc)
-	with open(os.path.join(pat, f'update_{tblname}.dspy'), 'w') as f:
+	with open(os.path.join(pat, f'update_{desc.tblname}.dspy'), 'w') as f:
 		f.write(s)
 
-def build_data_delete(pat: str, dbname:str, tblname: str, desc: dict):
+def build_data_delete(pat: str, desc: dict):
 	e = MyTemplateEngine([])
 	desc = desc.copy()
-	desc.dbname = dbname
 	s = e.renders(data_delete_tmpl, desc)
-	with open(os.path.join(pat, f'delete_{tblname}.dspy'), 'w') as f:
+	with open(os.path.join(pat, f'delete_{desc.tblname}.dspy'), 'w') as f:
 		f.write(s)
 
-def build_get_data(pat: str, dbname:str, tblname: str, desc: dict):
+def build_get_data(pat: str, desc: dict):
 	e = MyTemplateEngine([])
 	desc = desc.copy()
-	desc.dbname = dbname
 	desc.sql = construct_get_data_sql(desc)
 	s = e.renders(get_data_tmpl, desc)
-	with open(os.path.join(pat, f'get_{tblname}.dspy'), 'w') as f:
+	with open(os.path.join(pat, f'get_{desc.tblname}.dspy'), 'w') as f:
 		f.write(s)
 
 if __name__ == '__main__':
-	if len(sys.argv) < 3:
-		print(f'{sys.argv} models_dir created_ui')
+	"""
+	crud_json has following format
+	{
+		"models_dir",
+		"output_dir",
+		"dbname",
+		"tblname",
+		"params"
+	}
+	"""
+	if len(sys.argv) < 2:
+		print(f'{sys.argv} crud_json')
 		sys.exit(1)
-	
-	models_dir = sys.argv[1]
-	ui_dir = sys.argv[2]
+	crud_data = {}
+	with codecs.open(sys.argv[1], 'r', 'utf-8') as f:
+		crud_data = DictObject(**json.load(f))
+	models_dir = crud_data.models_dir
+	ui_dir = crud_data.output_dir
+	dbname = crud_data.dbname
 	dbdesc = build_dbdesc(models_dir)
-	build_crud_ui(ui_dir, 'kboss', dbdesc)
+	build_crud_ui(crud_data, dbdesc)
 

@@ -2,7 +2,12 @@ data_browser_tmpl = """
 {
     "widgettype":"Tabular",
     "options":{
+{% if title %}
 		"title":"{{tblname}}",
+{% endif %}
+{% if description %}
+		"description":"{{description}}",
+{% endif %}
 		"editable":{
 			"new_data_url":{%- raw -%}"{{entire_url('add_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_data_url":{%- raw -%}"{{entire_url('delete_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
@@ -13,10 +18,22 @@ data_browser_tmpl = """
         "record_view":{
             "widgettype":"DataRow",
             "options":{
+{% if record_toolbar %}
+				"toolbar":{{json.dumps(record_toolbar)}},
+{% endif %}
+{% if browserfields %}
+				"browserfields":{{json.dumps(browserfields)}},
+{% endif %}
+{% if editexclouded %}
+				"editexclouded":{{json.dumps(editexclouded)}},
+{% endif %}
                 "fields":{{fieldlist}}
-            },  
+            }  
         },  
-        "page_rows":800,
+{% if content_view %}
+		"content_view":{{json.dumps(content_view)}},
+{% endif %}
+        "page_rows":160,
         "cache_limit":5
     }   
 }
@@ -26,9 +43,11 @@ ns = params_kw.copy()
 if not ns.get('page'):
     ns['page'] = 1 
 if not ns.get('sort'):
-    ns['sort'] = 'name'
-if ns.get('name'):
-    ns['name'] = '%' + params_kw['name'] + '%' 
+{% if sortby %}
+    ns['sort'] = '{{sortby}}'
+{% else %}
+	ns['sort'] = 'id'
+{% endif %}
 
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
