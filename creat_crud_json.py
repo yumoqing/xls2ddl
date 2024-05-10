@@ -16,7 +16,7 @@ def create_crud(modelspath:str, outpath: str, ui_path: str, dbname:str, tblname:
 				"excloud":[],
 				"cwidth":{}
 			},
-			"editexclouded":[],
+			"editexclouded":['id'],
 			"record_toolbar":None,
 			"content_view":None,
 		}
@@ -27,8 +27,8 @@ def create_crud(modelspath:str, outpath: str, ui_path: str, dbname:str, tblname:
 		f.write(txt)
 
 def main():
-	model_path = sys.argv[1]
-	ui_path = sys.argv[2]
+	model_path = os.path.abspath(sys.argv[1])
+	ui_path = os.path.abspath(sys.argv[2])
 	outpath = sys.argv[3]
 	dbname = sys.argv[4]
 	dbdesc = build_dbdesc(model_path)

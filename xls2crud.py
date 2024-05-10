@@ -179,14 +179,15 @@ if __name__ == '__main__':
 	}
 	"""
 	if len(sys.argv) < 2:
-		print(f'{sys.argv} crud_json')
+		print(f'{sys.argv[0]} crud_json ...')
 		sys.exit(1)
-	crud_data = {}
-	with codecs.open(sys.argv[1], 'r', 'utf-8') as f:
-		crud_data = DictObject(**json.load(f))
-	models_dir = crud_data.models_dir
-	ui_dir = crud_data.output_dir
-	dbname = crud_data.dbname
-	dbdesc = build_dbdesc(models_dir)
-	build_crud_ui(crud_data, dbdesc)
+	for fn in sys.argv[1:]:
+		crud_data = {}
+		with codecs.open(fn, 'r', 'utf-8') as f:
+			crud_data = DictObject(**json.load(f))
+		models_dir = crud_data.models_dir
+		ui_dir = crud_data.output_dir
+		dbname = crud_data.dbname
+		dbdesc = build_dbdesc(models_dir)
+		build_crud_ui(crud_data, dbdesc)
 
