@@ -94,13 +94,12 @@ class CRUDException(Exception):
 		return 'filename:' + self.xlsfile+' error:' + self.errmsg
 
 class XLSXData(object):
-	def __init__(self,xlsxfile):
-		atype = type(xlsxfile) 
-		if atype == type(''):
-			self.xlsxfile = xlsxfile
+	def __init__(self,xlsxfile, book=None):
+		self.xlsxfile = xlsxfile
+		if book is None:
 			self.book = load_workbook(filename=xlsxfile)
 		else:
-			self.book = xlsxfile # is from Factory
+			self.book = book
 		self._read()
 
 	def get_data(self):
@@ -157,6 +156,9 @@ class XLSXData(object):
 class CRUDData(XLSXData):
 	@classmethod
 	def isMe(self,book):
+		if book is None:
+			return False
+
 		names = book.sheetnames
 		if 'summary' not in names:
 			return False
@@ -277,16 +279,19 @@ def xlsxFactory(xlsxfilename):
 			return None
 	try:
 		book = load_workbook(filename=xlsxfilename)
-		k = findSubclass(book,XLSXData)
+		if book is None:
+			print(f'{xlsxfilename} read error')
+			return None
+		k = findSubclass(book, XLSXData)
 		if k is not None:
-			xlsx = k(book)
-			xlsx.xlsxfile = xlsxfilename
+			xlsx = k(xlsxfilename, book=book)
 			return xlsx
-		return XLSXData(book)
+		return XLSXData(xlsxfilename, book=book)
 
 	except Exception as e:
 		print_exc()
 		print(xlsxfilename, 'new class failed\n%s' % str(e))
+		print_exc()
 		return None
 
 def ValueConvert(s):

@@ -15,20 +15,19 @@ data_browser_tmpl = """
 		},
 
         "data_url":"{%- raw -%}{{entire_url('./get_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
-        "record_view":{
-            "widgettype":"DataRow",
-            "options":{
+		"data_method":"{{data_method or 'GET'}}",
+		"data_params":{%- raw -%}{{json.dumps(params_kw)}},{%- endraw %}
+		"row_options":{
 {% if record_toolbar %}
-				"toolbar":{{json.dumps(record_toolbar)}},
+			"toolbar":{{json.dumps(record_toolbar)}},
 {% endif %}
 {% if browserfields %}
-				"browserfields":{{json.dumps(browserfields)}},
+			"browserfields":{{json.dumps(browserfields)}},
 {% endif %}
 {% if editexclouded %}
-				"editexclouded":{{json.dumps(editexclouded)}},
+			"editexclouded":{{json.dumps(editexclouded)}},
 {% endif %}
-                "fields":{{fieldlist}}
-            }  
+			"fields":{{json.dumps(fieldlist)}}
         },  
 {% if content_view %}
 		"content_view":{{json.dumps(content_view)}},
@@ -40,6 +39,7 @@ data_browser_tmpl = """
 """
 get_data_tmpl = """
 ns = params_kw.copy()
+print(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
     ns['page'] = 1 
 if not ns.get('sort'):
@@ -48,10 +48,19 @@ if not ns.get('sort'):
 {% else %}
 	ns['sort'] = 'id'
 {% endif %}
+filterjson = params_kw.get('data_filter')
+if not filterjson:
+	fields = [ f['name'] for f in {{json.dumps(fields)}} ]
+	filterjson = default_filterjson(fields, ns)
+sql = '''{{sql}}'''
+if filterjson:
+	dbf = DBFilter(filterjson)
+	conds = dbf.gen(ns)
+	ns.update(dbf.consts)
+	sql += ' and ' + conds
 
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
-    sql = '''{{sql}}'''
     r = await sor.sqlPaging(sql, ns) 
     return r
 return {

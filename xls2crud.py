@@ -107,11 +107,10 @@ def construct_get_data_sql(desc: dict) -> str:
 	shortnames = [c for c in 'bcdefghjklmnopqrstuvwxyz']
 	infos = []
 	if not desc.codes:
-		return f"select * from {desc.summary[0].name}"
+		return f"select * from {desc.summary[0].name} where 1=1"
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
-		cond = '1 = 1'
 		if c.cond:
 			cond = c.cond
 		csql = f"""(select {c.valuefield} as {c.field}, 

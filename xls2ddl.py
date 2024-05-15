@@ -46,7 +46,7 @@ def model2ddl(folder,dbtype):
 	ddl_str = ''
 	for f in listFile(folder, suffixs=['xlsx','json']):
 		try:
-			ddl_str += f'-- {f}\n'
+			ddl_str += f'\n-- {f}\n'
 			s = xls2ddl(f,dbtype)
 			ddl_str='%s%s' % (ddl_str, s)
 		except Exception as e:
