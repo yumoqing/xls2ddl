@@ -40,7 +40,28 @@ def xls2ddl(xlsfile,dbtype):
 		raise Exception('%s database not implemented' % dbtype)
 	e = MyTemplateEngine([])
 	s = e.renders(tmpl,data)
+	print(data.data)
+	if data.data:
+		ins = gen_insert(data)
+		s = f"{s}\n{ins}\n"
 	return s
+
+def gen_insert(xls):
+	tbl = xls.summary[0].name
+	lines = []
+	for d in xls.data:
+		ks = []
+		vs = []
+		for k,v in d.items():
+			ks.append(k)
+			if isinstance(v, str):
+				vs.append(f"'{v}'")
+			else:
+				vs.append(str(v))
+		
+		line = f"insert into {tbl} ({','.join(ks)}) values ({','.join(vs)});"
+		lines.append(line)
+	return "\n".join(lines)
 
 def model2ddl(folder,dbtype):
 	ddl_str = ''
@@ -48,7 +69,8 @@ def model2ddl(folder,dbtype):
 		try:
 			ddl_str += f'\n-- {f}\n'
 			s = xls2ddl(f,dbtype)
-			ddl_str='%s%s' % (ddl_str, s)
+			ddl_str = f"{ddl_str}\n{s}\n"
+
 		except Exception as e:
 			print('Exception:',e,'f=',f)
 			print_exc()
