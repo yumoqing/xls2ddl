@@ -74,10 +74,11 @@ id = uuid()
 ns['id'] = id
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
-    r = await sor.C('{{summary[0].name}}', ns)
+    r = await sor.C('{{summary[0].name}}', ns.copy())
     return {
         "widgettype":"Message",
         "options":{
+			"user_data":ns,
             "title":"Add Success",
             "message":"ok"
         }

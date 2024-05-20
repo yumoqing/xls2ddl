@@ -1,0 +1,15 @@
+{
+	"treetype":"singlestruct",
+	"dbname":"sage",
+	"table":"permission",
+	"idField":"id",
+	"textField":"name",
+	"editable":true,
+	"edit_exclouded_fields":["del_flg", "create_at"],
+	"check":true,
+	"parentField":"parentid",
+	"toolbar":{
+	},
+	"binds":[
+	]
+}

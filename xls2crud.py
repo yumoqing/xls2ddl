@@ -114,7 +114,7 @@ def construct_get_data_sql(desc: dict) -> str:
 		if c.cond:
 			cond = c.cond
 		csql = f"""(select {c.valuefield} as {c.field}, 
-			{c.textfield} as {c.field}_text from {c.table} where {cond})"""
+			{c.textfield} as {c.field}_text from {c.table} where {c.cond})"""
 		infos.append([shortname, f'{shortname}.{c.field}_text', csql, f"a.{c.field} = {shortname}.{c.valuefield}"])
 	if len(infos) == 0:
 		return f"select * from {desc.summary[0].name}"
