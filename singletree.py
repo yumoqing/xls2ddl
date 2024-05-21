@@ -27,7 +27,7 @@ ui_tmpl = """
 {% endif %}
 		"parentField":"{{parentField}}",
 		"idField":"{{idField}}",
-		"textField":"{{textFiled}}",
+		"textField":"{{textField}}",
 		"dataurl":{%- raw -%}"{{entire_url('./get_{%- endraw -%}{{table}}{%- raw -%}.dspy')}}",{%- endraw %}
 	}
 {% if binds %}
