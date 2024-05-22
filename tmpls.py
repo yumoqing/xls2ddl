@@ -18,6 +18,12 @@ data_browser_tmpl = """
 		"data_method":"{{data_method or 'GET'}}",
 		"data_params":{%- raw -%}{{json.dumps(params_kw)}},{%- endraw %}
 		"row_options":{
+{% if idField %}
+			"idField":"{{idField}}",
+{% endif %}
+{% if checkField %}
+			"checkField":"{{checkField}}",
+{% endif %}
 {% if record_toolbar %}
 			"toolbar":{{json.dumps(record_toolbar)}},
 {% endif %}
@@ -34,7 +40,9 @@ data_browser_tmpl = """
 {% endif %}
         "page_rows":160,
         "cache_limit":5
-    }   
+    }
+{% if binds %}
+	,"binds":{{json.dumps(binds)}}
 }
 """
 get_data_tmpl = """
