@@ -16,7 +16,7 @@ data_browser_tmpl = """
 
         "data_url":"{%- raw -%}{{entire_url('./get_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
 		"data_method":"{{data_method or 'GET'}}",
-		"data_params":{%- raw -%}{{json.dumps(params_kw)}},{%- endraw %}
+		"data_params":{%- raw -%}{{json.dumps(params_kw, indent=4)}},{%- endraw %}
 		"row_options":{
 {% if idField %}
 			"idField":"{{idField}}",
@@ -25,24 +25,24 @@ data_browser_tmpl = """
 			"checkField":"{{checkField}}",
 {% endif %}
 {% if record_toolbar %}
-			"toolbar":{{json.dumps(record_toolbar)}},
+			"toolbar":{{json.dumps(record_toolbar, indent=4)}},
 {% endif %}
 {% if browserfields %}
-			"browserfields":{{json.dumps(browserfields)}},
+			"browserfields":{{json.dumps(browserfields, indent=4)}},
 {% endif %}
 {% if editexclouded %}
-			"editexclouded":{{json.dumps(editexclouded)}},
+			"editexclouded":{{json.dumps(editexclouded, indent=4)}},
 {% endif %}
-			"fields":{{json.dumps(fieldlist)}}
+			"fields":{{json.dumps(fieldlist, indent=4)}}
         },  
 {% if content_view %}
-		"content_view":{{json.dumps(content_view)}},
+		"content_view":{{json.dumps(content_view, indent=4)}},
 {% endif %}
         "page_rows":160,
         "cache_limit":5
     }
 {% if binds %}
-	,"binds":{{json.dumps(binds)}}
+	,"binds":{{json.dumps(binds, indent=4)}}
 }
 """
 get_data_tmpl = """
@@ -58,7 +58,7 @@ if not ns.get('sort'):
 {% endif %}
 filterjson = params_kw.get('data_filter')
 if not filterjson:
-	fields = [ f['name'] for f in {{json.dumps(fields)}} ]
+	fields = [ f['name'] for f in {{json.dumps(fields, indent=4)}} ]
 	filterjson = default_filterjson(fields, ns)
 sql = '''{{sql}}'''
 if filterjson:

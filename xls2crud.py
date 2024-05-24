@@ -57,6 +57,8 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 		return None
 	for c in desc.codes:
 		if d.name == c.field:
+			d.label = d.title or d.name
+			d.uitype = 'code'
 			d.valueField = d.name
 			d.textField = d.name + '_text'
 			d.params = {
