@@ -3,7 +3,7 @@ data_browser_tmpl = """
     "widgettype":"Tabular",
     "options":{
 {% if title %}
-		"title":"{{tblname}}",
+		"title":"{{title}}",
 {% endif %}
 {% if description %}
 		"description":"{{description}}",
@@ -43,6 +43,7 @@ data_browser_tmpl = """
     }
 {% if binds %}
 	,"binds":{{json.dumps(binds, indent=4)}}
+{% endif %}
 }
 """
 get_data_tmpl = """
@@ -64,8 +65,9 @@ sql = '''{{sql}}'''
 if filterjson:
 	dbf = DBFilter(filterjson)
 	conds = dbf.gen(ns)
-	ns.update(dbf.consts)
-	sql += ' and ' + conds
+	if conds:
+		ns.update(dbf.consts)
+		sql += ' and ' + conds
 
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
@@ -78,7 +80,9 @@ return {
 """
 data_new_tmpl = """
 ns = params_kw.copy()
-id = uuid()
+id = params_kw.id
+if not id or len(id) > 32:
+	id = uuid()
 ns['id'] = id
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
@@ -126,7 +130,6 @@ return {
 data_delete_tmpl = """
 ns = {
     'id':params_kw['id'],
-    'del_flg':'1'
 }
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:

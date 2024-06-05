@@ -40,7 +40,7 @@ def xls2ddl(xlsfile,dbtype):
 		raise Exception('%s database not implemented' % dbtype)
 	e = MyTemplateEngine([])
 	s = e.renders(tmpl,data)
-	print(data.data)
+	# print(data.data)
 	if data.data:
 		ins = gen_insert(data)
 		s = f"{s}\n{ins}\n"

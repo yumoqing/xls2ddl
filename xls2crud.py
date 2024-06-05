@@ -62,13 +62,15 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			d.valueField = d.name
 			d.textField = d.name + '_text'
 			d.params = {
+				'dbname':desc.dbname,
 				'table':c.table,
 				'tblvalue':c.valuefield,
 				'tbltext':c.textfield,
-				'cond':c.cond,
 				'valueField':d.valueField,
 				'textField':d.textField
 			}
+			if c.cond:
+				d.params['cond'] = c.cond
 			d.dataurl = '/db/get_code.dspy'
 			return d
 	return None
@@ -100,7 +102,11 @@ def setup_ui_info(field:dict) ->dict:
 		elif d.name in ['password', 'passwd']:
 			d.uitype = 'password'
 		else:
-			d.uitype = 'str'
+			if d.type=='str' and d.length > 100:
+				d.uitype = 'text'
+				d.rows = 4
+			else:
+				d.uitype = 'str'
 	d.datatype = d.type
 	d.label = d.title or d.name
 	return d
@@ -113,20 +119,19 @@ def construct_get_data_sql(desc: dict) -> str:
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
+		cond = '1 = 1'
 		if c.cond:
 			cond = c.cond
 		csql = f"""(select {c.valuefield} as {c.field}, 
-			{c.textfield} as {c.field}_text from {c.table} where {c.cond})"""
-		infos.append([shortname, f'{shortname}.{c.field}_text', csql, f"a.{c.field} = {shortname}.{c.valuefield}"])
+			{c.textfield} as {c.field}_text from {c.table} where {cond})"""
+		infos.append([f'{shortname}.{c.field}_text', f"{csql} {shortname} on a.{c.field} = {shortname}.{c.field}"])
 	if len(infos) == 0:
 		return f"select * from {desc.summary[0].name}"
-	infos.append(['a', 'a.*', desc.summary[0].name, None]) 
-	fields = ', '.join([i[1] for i in infos])
-	tables = ', '.join([i[2] + ' ' + i[0] for i in infos])
-	conds = ' and '.join([i[3] for i in infos if i[3] is not None])
+	infos.insert(0, ['a.*', f'{desc.summary[0].name} a']) 
+	fields = ', '.join([i[0] for i in infos])
+	tables = ' left join '.join([i[1] for i in infos])
 	return f"""select {fields}
-from {tables}
-where {conds}"""
+from {tables}"""
 
 	if len(addonfields) > 0:
 		addonfields = ', ' + addonfields

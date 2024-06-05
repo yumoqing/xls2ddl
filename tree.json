@@ -6,7 +6,7 @@
 	"textField":"name",
 	"editable":true,
 	"edit_exclouded_fields":["del_flg", "create_at"],
-	"check":true,
+	"checkField":"dd",
 	"parentField":"parentid",
 	"toolbar":{
 	},

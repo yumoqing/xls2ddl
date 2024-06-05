@@ -16,22 +16,22 @@ ui_tmpl = """
 	"options":{
 {% if editable %}
 		"editable":{
-			"fields":{{json.dumps(edit_fields)}},
+			"fields":{{json.dumps(edit_fields, indent=4)}},
 			"add_url":{%- raw -%}"{{entire_url('./new_{%- endraw -%}{{table}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"update_url":{%- raw -%}"{{entire_url('./update_{%- endraw -%}{{table}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_url":{%- raw -%}"{{entire_url('./delete_{%- endraw -%}{{table}}{%- raw -%}.dspy')}}"{%- endraw %}
 		},
 {% endif %}
-{% if checkable %}
-		"checkable":true,
+{% if checkField %}
+		"checkField":"{{checkField}}",
 {% endif %}
 		"parentField":"{{parentField}}",
 		"idField":"{{idField}}",
 		"textField":"{{textField}}",
-		"dataurl":{%- raw -%}"{{entire_url('./get_{%- endraw -%}{{table}}{%- raw -%}.dspy')}}",{%- endraw %}
+		"dataurl":{%- raw -%}"{{entire_url('./get_{%- endraw -%}{{table}}{%- raw -%}.dspy')}}"{%- endraw %}
 	}
 {% if binds %}
-	,"binds":{{json.dumps(binds)}}
+	,"binds":{{json.dumps(binds, indent=4)}}
 {% endif %}
 }
 """
