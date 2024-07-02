@@ -92,6 +92,7 @@ async with db.sqlorContext('{{dbname}}') as sor:
         "options":{
 			"user_data":ns,
             "title":"Add Success",
+			"timeout":3,
             "message":"ok"
         }
     }
@@ -100,6 +101,7 @@ return {
     "widgettype":"Error",
     "options":{
         "title":"Add Error",
+		"timeout":3,
         "message":"failed"
     }
 }
@@ -114,6 +116,7 @@ async with db.sqlorContext('{{dbname}}') as sor:
         "widgettype":"Message",
         "options":{
             "title":"Update Success",
+			"timeout":3,
             "message":"ok"
         } 
     }
@@ -123,6 +126,7 @@ return {
     "widgettype":"Error",
     "options":{
         "title":"Update Error",
+		"timeout":3,
         "message":"failed"
     }
 }
@@ -139,6 +143,7 @@ async with db.sqlorContext('{{dbname}}') as sor:
         "widgettype":"Message",
         "options":{
             "title":"Delete Success",
+			"timeout":3,
             "message":"ok"
         }
     }
@@ -148,6 +153,7 @@ return {
     "widgettype":"Error",
     "options":{
         "title":"Delete Error",
+		"timeout":3,
         "message":"failed"
     }
 }
