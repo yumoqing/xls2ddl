@@ -8,7 +8,7 @@ data_browser_tmpl = """
 {% if description %}
 		"description":"{{description}}",
 {% endif %}
-{% if ! noedit %}
+{% if not noedit %}
 		"editable":{
 			"new_data_url":{%- raw -%}"{{entire_url('add_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_data_url":{%- raw -%}"{{entire_url('delete_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
