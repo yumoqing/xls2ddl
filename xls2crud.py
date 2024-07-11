@@ -114,8 +114,8 @@ def setup_ui_info(field:dict) ->dict:
 def construct_get_data_sql(desc: dict) -> str:
 	shortnames = [c for c in 'bcdefghjklmnopqrstuvwxyz']
 	infos = []
-	if not desc.codes:
-		return f"select * from {desc.summary[0].name} where 1=1"
+	if not desc.codes or len(desc.codes) == 0:
+		return f"select * from {desc.summary[0].name} where 1=1 " + "{}"
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
@@ -125,9 +125,8 @@ def construct_get_data_sql(desc: dict) -> str:
 		csql = f"""(select {c.valuefield} as {c.field}, 
 			{c.textfield} as {c.field}_text from {c.table} where {cond})"""
 		infos.append([f'{shortname}.{c.field}_text', f"{csql} {shortname} on a.{c.field} = {shortname}.{c.field}"])
-	if len(infos) == 0:
-		return f"select * from {desc.summary[0].name}"
-	infos.insert(0, ['a.*', f'{desc.summary[0].name} a']) 
+	bt = f'(select * from {desc.summary[0].name} where 1=1' + "{}) a"
+	infos.insert(0, ['a.*', bt]) 
 	fields = ', '.join([i[0] for i in infos])
 	tables = ' left join '.join([i[1] for i in infos])
 	return f"""select {fields}

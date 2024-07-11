@@ -8,11 +8,13 @@ data_browser_tmpl = """
 {% if description %}
 		"description":"{{description}}",
 {% endif %}
+{% if ! noedit %}
 		"editable":{
 			"new_data_url":{%- raw -%}"{{entire_url('add_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_data_url":{%- raw -%}"{{entire_url('delete_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"update_data_url":{%- raw -%}"{{entire_url('update_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}"{%- endraw %}
 		},
+{% endif %}
 
         "data_url":"{%- raw -%}{{entire_url('./get_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
 		"data_method":"{{data_method or 'GET'}}",
@@ -28,7 +30,7 @@ data_browser_tmpl = """
 			"toolbar":{{json.dumps(record_toolbar, indent=4)}},
 {% endif %}
 {% if browserfields %}
-			"browserfields":{{json.dumps(browserfields, indent=4)}},
+			"browserfields": {{json.dumps(browserfields, indent=4)}},
 {% endif %}
 {% if editexclouded %}
 			"editexclouded":{{json.dumps(editexclouded, indent=4)}},
@@ -67,8 +69,10 @@ if filterjson:
 	conds = dbf.gen(ns)
 	if conds:
 		ns.update(dbf.consts)
-		sql += ' and ' + conds
-
+		sql = sql.format(' and ' + conds)
+else:
+	sql = sql.format('')
+print(f'{sql=}')
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
     r = await sor.sqlPaging(sql, ns) 
