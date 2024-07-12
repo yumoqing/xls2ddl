@@ -40,15 +40,26 @@ def build_table_crud_ui(uidir: str, desc: dict) -> None:
 	build_data_delete(uidir, desc)
 	build_get_data(uidir, desc)
 
+def alter_field(field:dict, desc:DictObject) -> dict:
+	name = field['name']
+	ret = field.copy()
+	alters = desc.browserfields.alters
+	if alters:
+		[ ret.update(alters[k]) for k in alters.keys() if k == name ]
+	return ret
+
 def field_list(desc: dict) -> list:
 	fs = []
 	for f in desc.fields:
 		if desc.codes and f.name in [c.field for c in desc.codes]:
 			d = get_code_desc(f, desc)
-			fs.append(d)
 		else:
 			d = setup_ui_info(f)
-			fs.append(d)
+		"""
+		use alters to modify fields
+		"""
+		d = alter_field(d, desc)
+		fs.append(d)
 	return fs
 
 def get_code_desc(field: dict, desc: dict) -> dict:
@@ -136,6 +147,7 @@ from {tables}"""
 		addonfields = ', ' + addonfields
 	
 def build_data_browser(pat: str, desc: dict):
+	# print(desc)
 	desc = desc.copy()
 	desc.fieldlist = field_list(desc)
 	e = MyTemplateEngine([])
