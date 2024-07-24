@@ -50,6 +50,10 @@ data_browser_tmpl = """
 """
 get_data_tmpl = """
 ns = params_kw.copy()
+{% if with_current_user %}
+userid = await get_user()
+ns['userid'] = userid
+{% endif %}
 print(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
     ns['page'] = 1 
