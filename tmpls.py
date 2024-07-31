@@ -2,12 +2,17 @@ data_browser_tmpl = """
 {
     "widgettype":"Tabular",
     "options":{
+{% if not notitle %}
 {% if title %}
 		"title":"{{title}}",
+{% else %}
+		"title":"{{summary[0].title}}",
+{% endif %}
 {% endif %}
 {% if description %}
 		"description":"{{description}}",
 {% endif %}
+		"css":"card",
 {% if not noedit %}
 		"editable":{
 			"new_data_url":{%- raw -%}"{{entire_url('add_{%- endraw -%}{{summary[0].name}}{%- raw -%}.dspy')}}",{%- endraw %}
@@ -59,7 +64,11 @@ if not ns.get('page'):
     ns['page'] = 1 
 if not ns.get('sort'):
 {% if sortby %}
+{% if type(sortby) == type("") %}
     ns['sort'] = '{{sortby}}'
+{% else %}
+	ns['sort'] = {{json.dumps(sortby)}}
+{% endif %}
 {% else %}
 	ns['sort'] = 'id'
 {% endif %}
