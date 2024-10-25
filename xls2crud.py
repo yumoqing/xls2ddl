@@ -28,6 +28,51 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 	uidir = crud_data.output_dir
 	desc = dbdesc[crud_data.tblname]
 	desc.update(crud_data.params)
+	if crud_data.params.subtables:
+		if len(crud_data.params.subtables) == 1:
+			t = crud_data.params.subtables[0]
+			url = t.url or f"../{t.subtable}"
+			content_view = DictObject(**{
+	            "widgettype":"urlwidget",
+				"options":{
+					"params":{
+						"oops":1,
+						f"{t.field}":"${id}"
+					},  
+					"url":"{{entire_url('" + url + "')}}"
+				}   
+			})
+		else:
+			items = []
+			for t in crud_data.params.subtables:
+				url = t.url or f"../{t.subtable}"
+				item = {
+					"name":t.subtable,
+					"label":t.title or t.subtable,
+					"content":{
+						"widgettype":"urlwidget",
+						"options":{
+							"params":{
+								"oops":1,
+								f"{t.field}":"${id}"
+							},  
+							"url":"{{entire_url('" + url + "')}}"
+						}   
+					}   
+				}
+				items.append(item)
+			content_view = DictObject(**{
+				"widgettype":"TabPanel",
+				"options":{
+					"tab_wide":"auto",
+					"height":"100%",
+					"width":"100%",
+					"tab_pos":"top",
+					"items":items
+				}
+			})
+		desc.content_view = content_view
+
 	desc.update({
 		"tblname":crud_data.tblname,
 		"dbname":crud_data.dbname
