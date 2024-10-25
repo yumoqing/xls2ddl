@@ -2,11 +2,13 @@ import os
 import sys
 import codecs
 import json
+
 from appPublic.dictObject import DictObject
 from xlsxData import xlsxFactory
 from appPublic.folderUtils import listFile, _mkdir
 from appPublic.myTE import MyTemplateEngine
 from tmpls import data_browser_tmpl, get_data_tmpl, data_new_tmpl, data_update_tmpl, data_delete_tmpl
+from appPublic.argsConvert import ArgsConvert
 
 """
 usage:
@@ -198,10 +200,15 @@ if __name__ == '__main__':
 	if len(sys.argv) < 2:
 		print(f'{sys.argv[0]} crud_json ...')
 		sys.exit(1)
+	ns = {k:v for k, v in os.environ.items()}
 	for fn in sys.argv[1:]:
 		crud_data = {}
 		with codecs.open(fn, 'r', 'utf-8') as f:
-			crud_data = DictObject(**json.load(f))
+			a = json.load(f)
+			ac = ArgsConvert('${','}$')
+			a = ac.convert(a,ns)
+			crud_data = DictObject(**a)
+			print(f'{crud_data=}')
 		models_dir = crud_data.models_dir
 		ui_dir = crud_data.output_dir
 		dbname = crud_data.dbname
