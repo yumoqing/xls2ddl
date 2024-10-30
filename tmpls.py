@@ -55,9 +55,9 @@ data_browser_tmpl = """
 """
 get_data_tmpl = """
 ns = params_kw.copy()
-{% if with_current_user %}
+{% if logined_user %}
 userid = await get_user()
-ns['userid'] = userid
+ns['{{logined_user}}'] = userid
 {% endif %}
 print(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
@@ -101,6 +101,10 @@ id = params_kw.id
 if not id or len(id) > 32:
 	id = uuid()
 ns['id'] = id
+{% if logined_user %}
+userid = await get_user()
+ns['{{logined_user}}'] = userid
+{% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
     r = await sor.C('{{summary[0].name}}', ns.copy())
@@ -125,6 +129,10 @@ return {
 """
 data_update_tmpl = """
 ns = params_kw.copy()
+{% if logined_user %}
+userid = await get_user()
+ns['{{logined_user}}'] = userid
+{% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
     r = await sor.U('{{summary[0].name}}', ns)
@@ -152,6 +160,10 @@ data_delete_tmpl = """
 ns = {
     'id':params_kw['id'],
 }
+{% if logined_user %}
+userid = await get_user()
+ns['{{logined_user}}'] = userid
+{% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
     r = await sor.D('{{summary[0].name}}', ns)
