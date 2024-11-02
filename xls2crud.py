@@ -81,6 +81,7 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 
 def build_table_crud_ui(uidir: str, desc: dict) -> None:
 	_mkdir(uidir)
+	print('table_desc=', desc)
 	build_data_browser(uidir, desc)
 	build_data_new(uidir, desc)
 	build_data_update(uidir, desc)

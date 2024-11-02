@@ -55,9 +55,20 @@ data_browser_tmpl = """
 """
 get_data_tmpl = """
 ns = params_kw.copy()
-{% if logined_user %}
+{% if logined_userid %}
 userid = await get_user()
-ns['{{logined_user}}'] = userid
+if not userid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userid}}'] = userid
 {% endif %}
 print(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
@@ -101,9 +112,20 @@ id = params_kw.id
 if not id or len(id) > 32:
 	id = uuid()
 ns['id'] = id
-{% if logined_user %}
+{% if logined_userid %}
 userid = await get_user()
-ns['{{logined_user}}'] = userid
+if not userid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userid}}'] = userid
 {% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
@@ -112,6 +134,8 @@ async with db.sqlorContext('{{dbname}}') as sor:
         "widgettype":"Message",
         "options":{
 			"user_data":ns,
+			"cwidth":16,
+			"cheight":9,
             "title":"Add Success",
 			"timeout":3,
             "message":"ok"
@@ -122,6 +146,8 @@ return {
     "widgettype":"Error",
     "options":{
         "title":"Add Error",
+		"cwidth":16,
+		"cheight":9,
 		"timeout":3,
         "message":"failed"
     }
@@ -129,9 +155,20 @@ return {
 """
 data_update_tmpl = """
 ns = params_kw.copy()
-{% if logined_user %}
+{% if logined_userid %}
 userid = await get_user()
-ns['{{logined_user}}'] = userid
+if not userid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userid}}'] = userid
 {% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
@@ -141,6 +178,8 @@ async with db.sqlorContext('{{dbname}}') as sor:
         "widgettype":"Message",
         "options":{
             "title":"Update Success",
+			"cwidth":16,
+			"cheight":9,
 			"timeout":3,
             "message":"ok"
         } 
@@ -151,6 +190,8 @@ return {
     "widgettype":"Error",
     "options":{
         "title":"Update Error",
+		"cwidth":16,
+		"cheight":9,
 		"timeout":3,
         "message":"failed"
     }
@@ -160,9 +201,20 @@ data_delete_tmpl = """
 ns = {
     'id':params_kw['id'],
 }
-{% if logined_user %}
+{% if logined_userid %}
 userid = await get_user()
-ns['{{logined_user}}'] = userid
+if not userid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userid}}'] = userid
 {% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
@@ -173,6 +225,8 @@ async with db.sqlorContext('{{dbname}}') as sor:
         "options":{
             "title":"Delete Success",
 			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
             "message":"ok"
         }
     }
@@ -183,6 +237,8 @@ return {
     "options":{
         "title":"Delete Error",
 		"timeout":3,
+		"cwidth":16,
+		"cheight":9,
         "message":"failed"
     }
 }
