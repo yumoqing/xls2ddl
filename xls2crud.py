@@ -81,7 +81,7 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 
 def build_table_crud_ui(uidir: str, desc: dict) -> None:
 	_mkdir(uidir)
-	print('table_desc=', desc)
+	# print('table_desc=', desc)
 	build_data_browser(uidir, desc)
 	build_data_new(uidir, desc)
 	build_data_update(uidir, desc)
@@ -254,7 +254,7 @@ if __name__ == '__main__':
 			ac = ArgsConvert('${','}$')
 			a = ac.convert(a,ns)
 			crud_data = DictObject(**a)
-			print(f'{crud_data=}')
+			# print(f'{crud_data=}')
 		models_dir = crud_data.models_dir
 		ui_dir = crud_data.output_dir
 		dbname = crud_data.dbname
