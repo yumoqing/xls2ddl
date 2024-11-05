@@ -2,6 +2,7 @@ import os
 import sys
 import codecs
 import json
+import argparse
 
 from appPublic.dictObject import DictObject
 from xlsxData import xlsxFactory
@@ -243,6 +244,13 @@ if __name__ == '__main__':
 		"params"
 	}
 	"""
+	parser = argparse.ArgumentParser('xls2crud')
+	parser.add_argument('-m', '--models_dir')
+	parser.add_argument('-o', '--output_dir')
+	parser.add_argument('files', nargs='*')
+	args = parser.parse_args()
+	print(args)
+	sys.exit(1)
 	if len(sys.argv) < 2:
 		print(f'{sys.argv[0]} crud_json ...')
 		sys.exit(1)
