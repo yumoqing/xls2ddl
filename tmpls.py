@@ -70,6 +70,21 @@ if not userid:
 	}
 ns['{{logined_userid}}'] = userid
 {% endif %}
+{% if logined_userorgid %}
+userorgid = await get_userorgid()
+if not userorgid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userorgid}}'] = userorgid
+{% endif %}
 print(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
     ns['page'] = 1 
@@ -127,6 +142,21 @@ if not userid:
 	}
 ns['{{logined_userid}}'] = userid
 {% endif %}
+{% if logined_userorgid %}
+userorgid = await get_userorgid()
+if not userorgid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userorgid}}'] = userorgid
+{% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
     r = await sor.C('{{summary[0].name}}', ns.copy())
@@ -169,6 +199,21 @@ if not userid:
 		}
 	}
 ns['{{logined_userid}}'] = userid
+{% endif %}
+{% if logined_userorgid %}
+userorgid = await get_userorgid()
+if not userorgid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
@@ -215,6 +260,21 @@ if not userid:
 		}
 	}
 ns['{{logined_userid}}'] = userid
+{% endif %}
+{% if logined_userorgid %}
+userorgid = await get_userorgid()
+if not userorgid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
 async with db.sqlorContext('{{dbname}}') as sor:
