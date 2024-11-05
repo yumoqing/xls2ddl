@@ -249,22 +249,20 @@ if __name__ == '__main__':
 	parser.add_argument('-o', '--output_dir')
 	parser.add_argument('files', nargs='*')
 	args = parser.parse_args()
-	print(args)
-	sys.exit(1)
-	if len(sys.argv) < 2:
-		print(f'{sys.argv[0]} crud_json ...')
-		sys.exit(1)
 	ns = {k:v for k, v in os.environ.items()}
-	for fn in sys.argv[1:]:
+	for fn in args.files:
 		crud_data = {}
 		with codecs.open(fn, 'r', 'utf-8') as f:
 			a = json.load(f)
 			ac = ArgsConvert('${','}$')
 			a = ac.convert(a,ns)
 			crud_data = DictObject(**a)
-			# print(f'{crud_data=}')
 		models_dir = crud_data.models_dir
 		ui_dir = crud_data.output_dir
+		if args.models_dir:
+			models_dir = args.models_dir
+		if args.output_dir:
+			ui_dir = args.output_dir
 		dbname = crud_data.dbname
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
