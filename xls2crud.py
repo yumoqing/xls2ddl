@@ -268,8 +268,6 @@ if __name__ == '__main__':
 			crud_data.output_dir = os.path.join(args.output_dir, crud_data.tblname)
 		if args.models_dir:
 			crud_data.models_dir = args.models_dir
-		if args.dbname:
-			crud_data.dbname = args.dbname
 		crud_data.params.modulename = args.modulename
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
