@@ -27,6 +27,7 @@ def build_dbdesc(models_dir: str) -> dict:
 
 def build_crud_ui(crud_data: dict, dbdesc: dict):
 	uidir = crud_data.output_dir
+	print(f'write to {uidir}')
 	desc = dbdesc[crud_data.tblname]
 	desc.update(crud_data.params)
 	if crud_data.params.subtables:
@@ -247,6 +248,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser('xls2crud')
 	parser.add_argument('-m', '--models_dir')
 	parser.add_argument('-o', '--output_dir')
+	parser.add_argument('-d', '--dbname')
 	parser.add_argument('files', nargs='*')
 	args = parser.parse_args()
 	ns = {k:v for k, v in os.environ.items()}
@@ -258,12 +260,12 @@ if __name__ == '__main__':
 			a = ac.convert(a,ns)
 			crud_data = DictObject(**a)
 		models_dir = crud_data.models_dir
-		ui_dir = crud_data.output_dir
-		if args.models_dir:
-			models_dir = args.models_dir
 		if args.output_dir:
-			ui_dir = args.output_dir
-		dbname = crud_data.dbname
+			crud_data.output_dir = os.path.join(args.output_dir, crud_data.tblname)
+		if args.models_dir:
+			crud_data.models_dir = args.models_dir
+		if args.dbname:
+			crud_data.dbname = args.dbname
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
 
