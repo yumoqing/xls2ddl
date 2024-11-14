@@ -113,7 +113,8 @@ else:
 	sql = sql.format('')
 print(f'{sql=}')
 db = DBPools()
-async with db.sqlorContext('{{dbname}}') as sor:
+dbname = await rfexe('get_module_dbname', '{{modulename}}')
+async with db.sqlorContext(dbname) as sor:
     r = await sor.sqlPaging(sql, ns) 
     return r
 return {
@@ -158,7 +159,8 @@ if not userorgid:
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
-async with db.sqlorContext('{{dbname}}') as sor:
+dbname = await rfexe('get_module_dbname', '{{modulename}}')
+async with db.sqlorContext(dbname) as sor:
     r = await sor.C('{{summary[0].name}}', ns.copy())
     return {
         "widgettype":"Message",
@@ -216,7 +218,8 @@ if not userorgid:
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
-async with db.sqlorContext('{{dbname}}') as sor:
+dbname = await rfexe('get_module_dbname', '{{modulename}}')
+async with db.sqlorContext(dbname) as sor:
     r = await sor.U('{{summary[0].name}}', ns)
     print('update success');
     return {
@@ -277,7 +280,8 @@ if not userorgid:
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
-async with db.sqlorContext('{{dbname}}') as sor:
+dbname = await rfexe('get_module_dbname', '{{modulename}}')
+async with db.sqlorContext(dbname) as sor:
     r = await sor.D('{{summary[0].name}}', ns)
     print('delete success');
     return {

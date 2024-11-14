@@ -248,9 +248,13 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser('xls2crud')
 	parser.add_argument('-m', '--models_dir')
 	parser.add_argument('-o', '--output_dir')
-	parser.add_argument('-d', '--dbname')
+	parser.add_argument('modulename')
 	parser.add_argument('files', nargs='*')
 	args = parser.parse_args()
+	if len(args.files) < 1:
+		print(f'Usage:\n{sys.argv[0]} [-m models_dir] [-o output_dir] json_file ....\n')
+		sys.exit(1)
+	print(args)
 	ns = {k:v for k, v in os.environ.items()}
 	for fn in args.files:
 		crud_data = {}
@@ -266,6 +270,7 @@ if __name__ == '__main__':
 			crud_data.models_dir = args.models_dir
 		if args.dbname:
 			crud_data.dbname = args.dbname
+		crud_data.params.modulename = args.modulename
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
 
