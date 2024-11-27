@@ -98,9 +98,11 @@ if not ns.get('sort'):
 {% else %}
 	ns['sort'] = 'id'
 {% endif %}
+{% if relation %}
+ns['sort'] = '{{relation.outter_field}}_text'
+{% endif %}
 sql = '''{{sql}}'''
 {% if not relation %}
-ns['sort'] = '{{relation.outter_field}}_text'
 filterjson = params_kw.get('data_filter')
 if not filterjson:
 	fields = [ f['name'] for f in {{json.dumps(fields, indent=4)}} ]
