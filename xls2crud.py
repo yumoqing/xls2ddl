@@ -202,9 +202,9 @@ case when b.{desc.relation.param_field} is NULL then 0 else 1 end has_{desc.rela
 a.{code.valuefield} as {code.field}, 
 a.{code.textfield} as {code.field}_text
 from {code.table} a left join 
-(select * from {desc.tblname} where {code.field} ={param_field}) b 
+(select * from {desc.tblname} where {desc.relation.param_field} ={param_field}) b 
 	on a.{code.valuefield} = b.{code.field}
-where 1=1 """ + '{}'
+"""
 	else:
 		print('===== not ======', desc.relation, 'codes=', desc.codes)
 	if not desc.codes or len(desc.codes) == 0:

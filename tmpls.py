@@ -98,11 +98,13 @@ if not ns.get('sort'):
 {% else %}
 	ns['sort'] = 'id'
 {% endif %}
+sql = '''{{sql}}'''
+{% if not relation %}
+ns['sort'] = '{{relation.outter_field}}_text'
 filterjson = params_kw.get('data_filter')
 if not filterjson:
 	fields = [ f['name'] for f in {{json.dumps(fields, indent=4)}} ]
 	filterjson = default_filterjson(fields, ns)
-sql = '''{{sql}}'''
 if filterjson:
 	dbf = DBFilter(filterjson)
 	conds = dbf.gen(ns)
@@ -111,7 +113,8 @@ if filterjson:
 		sql = sql.format(' and ' + conds)
 else:
 	sql = sql.format('')
-print(f'{sql=}')
+{% endif %}
+debug(f'{sql=}')
 db = DBPools()
 dbname = await rfexe('get_module_dbname', '{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
@@ -308,7 +311,7 @@ return {
 """
 
 check_changed_tmpls = """
-is_checked = params_kw.get('{{relation.check_field}}')
+is_checked = params_kw.get('has_{{relation.param_field}}')
 print(params_kw, is_checked)
 dbname = await rfexe('get_module_dbname','{{modulename}}')
 if is_checked == 'true':
@@ -334,7 +337,7 @@ else:
         "{{relation.param_field}}":params_kw.{{relation.param_field}},
         "{{relation.outter_field}}":params_kw.{{relation.outter_field}}
     }
-    sql = "delete from {{tblname}} where {{relation.param_field}}=" + "${" + "{{relation.param_field}}" + "}$" + " and {{relation.outter_field}}=" + "${" + "{{relation.outer_field}}" + "}$"
+    sql = "delete from {{tblname}} where {{relation.param_field}}=" + "${" + "{{relation.param_field}}" + "}$" + " and {{relation.outter_field}}=" + "${" + "{{relation.outter_field}}" + "}$"
     db = DBPools()
     async with db.sqlorContext(dbname) as sor:
         await sor.sqlExe(sql, ns)
