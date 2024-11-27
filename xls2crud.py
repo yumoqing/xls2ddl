@@ -8,7 +8,7 @@ from appPublic.dictObject import DictObject
 from xlsxData import xlsxFactory
 from appPublic.folderUtils import listFile, _mkdir
 from appPublic.myTE import MyTemplateEngine
-from tmpls import data_browser_tmpl, get_data_tmpl, data_new_tmpl, data_update_tmpl, data_delete_tmpl
+from tmpls import data_browser_tmpl, get_data_tmpl, data_new_tmpl, data_update_tmpl, data_delete_tmpl, check_changed_tmpls
 from appPublic.argsConvert import ArgsConvert
 
 """
@@ -30,6 +30,20 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 	print(f'write to {uidir}')
 	desc = dbdesc[crud_data.tblname]
 	desc.update(crud_data.params)
+	if desc.relation:
+		desc.checkField = 'has_' + desc.relation.param_field 
+		binds = desc.binds or []
+		binds.append({
+            "wid":"self",
+            "event":"row_check_changed",
+            "actiontype":"urlwidget",
+            "target":"self",
+            "options":{
+                "params":{},
+                "url":"{{entire_url('check_changed.dspy')}}"
+            }
+        })
+		desc.binds = binds
 	if crud_data.params.subtables:
 		if len(crud_data.params.subtables) == 1:
 			t = crud_data.params.subtables[0]
@@ -85,9 +99,12 @@ def build_table_crud_ui(uidir: str, desc: dict) -> None:
 	_mkdir(uidir)
 	# print('table_desc=', desc)
 	build_data_browser(uidir, desc)
-	build_data_new(uidir, desc)
-	build_data_update(uidir, desc)
-	build_data_delete(uidir, desc)
+	if desc.relation:
+		build_check_changed(uidir, desc)
+	else:
+		build_data_new(uidir, desc)
+		build_data_update(uidir, desc)
+		build_data_delete(uidir, desc)
 	build_get_data(uidir, desc)
 
 def alter_field(field:dict, desc:DictObject) -> dict:
@@ -175,8 +192,23 @@ def setup_ui_info(field:dict) ->dict:
 def construct_get_data_sql(desc: dict) -> str:
 	shortnames = [c for c in 'bcdefghjklmnopqrstuvwxyz']
 	infos = []
+	if desc.relation and desc.codes:
+		print('============')
+		param_field = "${" + desc.relation.param_field + "}$"
+		for code in desc.codes:
+			if code.field == desc.relation.outter_field:
+				return f"""select b.{desc.relation.param_field}, 
+case when b.{desc.relation.param_field} is NULL then 0 else 1 end has_{desc.relation.param_field},
+a.{code.valuefield} as {code.field}, 
+a.{code.textfield} as {code.field}_text
+from {code.table} a left join 
+(select * from {desc.tblname} where {code.field} ={param_field}) b 
+	on a.{code.valuefield} = b.{code.field}
+where 1=1 """ + '{}'
+	else:
+		print('===== not ======', desc.relation, 'codes=', desc.codes)
 	if not desc.codes or len(desc.codes) == 0:
-		return f"select * from {desc.summary[0].name} where 1=1 " + "{}"
+		return f"select * from {desc.tblname} where 1=1 " + '{}'
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
@@ -193,8 +225,6 @@ def construct_get_data_sql(desc: dict) -> str:
 	return f"""select {fields}
 from {tables}"""
 
-	if len(addonfields) > 0:
-		addonfields = ', ' + addonfields
 	
 def build_data_browser(pat: str, desc: dict):
 	# print(desc)
@@ -233,6 +263,13 @@ def build_get_data(pat: str, desc: dict):
 	s = e.renders(get_data_tmpl, desc)
 	with open(os.path.join(pat, f'get_{desc.tblname}.dspy'), 'w') as f:
 		f.write(s)
+
+def build_check_changed(pat:str, desc:dict):
+    e = MyTemplateEngine([])
+    desc = desc.copy()
+    s = e.renders(check_changed_tmpls, desc)
+    with open(os.path.join(pat, 'check_changed.dspy'), 'w') as f:
+        f.write(s)
 
 if __name__ == '__main__':
 	"""

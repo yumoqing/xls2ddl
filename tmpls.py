@@ -233,7 +233,6 @@ async with db.sqlorContext(dbname) as sor:
         } 
     }
         
-print('update failed');
 return {
     "widgettype":"Error",
     "options":{
@@ -306,4 +305,46 @@ return {
         "message":"failed"
     }
 }
+"""
+
+check_changed_tmpls = """
+is_checked = params_kw.get('{{relation.check_field}}')
+print(params_kw, is_checked)
+dbname = await rfexe('get_module_dbname','{{modulename}}')
+if is_checked == 'true':
+    ns = {
+        "id":uuid(),
+        "{{relation.param_field}}":params_kw.{{relation.param_field}},
+        "{{relation.outter_field}}":params_kw.{{relation.outter_field}}
+    }
+    db = DBPools();
+    async with db.sqlorContext(dbname) as sor:
+        await sor.C('{{tblname}}', ns)
+
+    return  {
+        "widgettype":"Message",
+        "options":{
+            "title":"Success",
+            "message":"record add success",
+            "timeout":2
+        }
+    }
+else:
+    ns = {
+        "{{relation.param_field}}":params_kw.{{relation.param_field}},
+        "{{relation.outter_field}}":params_kw.{{relation.outter_field}}
+    }
+    sql = "delete from {{tblname}} where {{relation.param_field}}=" + "${" + "{{relation.param_field}}" + "}$" + " and {{relation.outter_field}}=" + "${" + "{{relation.outer_field}}" + "}$"
+    db = DBPools()
+    async with db.sqlorContext(dbname) as sor:
+        await sor.sqlExe(sql, ns)
+
+    return  {
+        "widgettype":"Message",
+        "options":{
+            "title":"Success",
+            "message":"delete record success",
+            "timeout":3
+        }
+    }
 """
