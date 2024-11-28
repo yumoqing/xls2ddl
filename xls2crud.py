@@ -197,7 +197,7 @@ def construct_get_data_sql(desc: dict) -> str:
 		param_field = "${" + desc.relation.param_field + "}$"
 		for code in desc.codes:
 			if code.field == desc.relation.outter_field:
-				return f"""select b.{desc.relation.param_field}, 
+				return f"""select '$[{desc.relation.param_field}]$' as {desc.relation.param_field}, 
 case when b.{desc.relation.param_field} is NULL then 0 else 1 end has_{desc.relation.param_field},
 a.{code.valuefield} as {code.field}, 
 a.{code.textfield} as {code.field}_text
