@@ -39,6 +39,21 @@ for sqlserver
 ```
 python path/to/xls2ddl.py sqlserver .
 ```
+## examples xlsx file
+open the [examples.xlsx](./examples.xlsx) to find out how to write a table schema infomation
+
+write your table schema info file:
+
+1 copy examples.xlsx file to 'your table name'.xlsx
+2 open 'your table name'.xlsx and change information in summary, fields, validation codes
+3 save it
+4 use xls2ddl translates xlsx file to ddl file
+5 use the ddl file to create you database tables
+
+# xls2crud
+xls2crud is a tool to create table data administration website user interface.
+it is only support [ahserver](https://git.kaiyuancloud.cn/yumoqing/ahserver) backend server and [bricks](https://git.kaiyuancloud.cn/yumoqing/bricks) front end
+
 
 
 

@@ -27,7 +27,8 @@ def build_dbdesc(models_dir: str) -> dict:
 
 def build_crud_ui(crud_data: dict, dbdesc: dict):
 	uidir = crud_data.output_dir
-	print(f'write to {uidir}')
+	tables = [ k for k in dbdesc.keys() ]
+	print(f'write to {uidir},{tables=}')
 	desc = dbdesc[crud_data.tblname]
 	desc.update(crud_data.params)
 	if desc.relation:
@@ -47,7 +48,7 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 	if crud_data.params.subtables:
 		if len(crud_data.params.subtables) == 1:
 			t = crud_data.params.subtables[0]
-			url = t.url or f"../{t.subtable}"
+			url = f"../{t.subtable}"
 			content_view = DictObject(**{
 	            "widgettype":"urlwidget",
 				"options":{
@@ -61,7 +62,7 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 		else:
 			items = []
 			for t in crud_data.params.subtables:
-				url = t.url or f"../{t.subtable}"
+				url = f"../{t.subtable}"
 				item = {
 					"name":t.subtable,
 					"label":t.title or t.subtable,
@@ -140,7 +141,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			d.valueField = d.name
 			d.textField = d.name + '_text'
 			d.params = {
-				'dbname':desc.dbname,
+				'dbname':"{{rfexe('get_module_dbname', '" + desc.modulename + "')}}",
 				'table':c.table,
 				'tblvalue':c.valuefield,
 				'tbltext':c.textfield,
@@ -300,12 +301,13 @@ if __name__ == '__main__':
 			ac = ArgsConvert('${','}$')
 			a = ac.convert(a,ns)
 			crud_data = DictObject(**a)
+		if args.models_dir:
+			crud_data.models_dir = args.models_dir
 		models_dir = crud_data.models_dir
 		if args.output_dir:
 			crud_data.output_dir = os.path.join(args.output_dir, crud_data.tblname)
-		if args.models_dir:
-			crud_data.models_dir = args.models_dir
 		crud_data.params.modulename = args.modulename
+		print(models_dir)
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
 
