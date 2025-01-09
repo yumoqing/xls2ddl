@@ -1,5 +1,6 @@
 data_browser_tmpl = """
 {
+	"id":"{{tblname}}_tbl",
     "widgettype":"Tabular",
     "options":{
 {% if not notitle %}
