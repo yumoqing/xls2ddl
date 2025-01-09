@@ -12,6 +12,9 @@ data_browser_tmpl = """
 {% if description %}
 		"description":"{{description}}",
 {% endif %}
+{% if toolbar %}
+			"toolbar":{{json.dumps(toolbar, indent=4)}},
+{% endif %}
 		"css":"card",
 {% if not noedit %}
 		"editable":{
@@ -30,9 +33,6 @@ data_browser_tmpl = """
 {% endif %}
 {% if checkField %}
 			"checkField":"{{checkField}}",
-{% endif %}
-{% if record_toolbar %}
-			"toolbar":{{json.dumps(record_toolbar, indent=4)}},
 {% endif %}
 {% if browserfields %}
 			"browserfields": {{json.dumps(browserfields, indent=4)}},
