@@ -1,6 +1,5 @@
 {
 	"treetype":"singlestruct",
-	"dbname":"sage",
 	"table":"permission",
 	"idField":"id",
 	"textField":"name",

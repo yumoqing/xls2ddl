@@ -295,6 +295,7 @@ if __name__ == '__main__':
 	print(args)
 	ns = {k:v for k, v in os.environ.items()}
 	for fn in args.files:
+		print(f'handle {fn}')
 		crud_data = {}
 		with codecs.open(fn, 'r', 'utf-8') as f:
 			a = json.load(f)
@@ -307,7 +308,6 @@ if __name__ == '__main__':
 		if args.output_dir:
 			crud_data.output_dir = os.path.join(args.output_dir, crud_data.tblname)
 		crud_data.params.modulename = args.modulename
-		print(models_dir)
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
 
