@@ -150,7 +150,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			}
 			if c.cond:
 				d.params['cond'] = c.cond
-			d.dataurl = '/get_code.dspy'
+			d.dataurl = "{{entire_url('/get_code.dspy')}}"
 			return d
 	return None
 
