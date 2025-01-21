@@ -150,7 +150,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			}
 			if c.cond:
 				d.params['cond'] = c.cond
-			d.dataurl = '/appbase/get_code.dspy'
+			d.dataurl = "{{entire_url('/appbase/get_code.dspy')}}"
 			return d
 	return None
 
@@ -276,9 +276,6 @@ if __name__ == '__main__':
 	"""
 	crud_json has following format
 	{
-		"models_dir",
-		"output_dir",
-		"dbname",
 		"tblname",
 		"params"
 	}
@@ -306,7 +303,8 @@ if __name__ == '__main__':
 			crud_data.models_dir = args.models_dir
 		models_dir = crud_data.models_dir
 		if args.output_dir:
-			crud_data.output_dir = os.path.join(args.output_dir, crud_data.tblname)
+			tblname = crud_data.alias or crud_data.tblname
+			crud_data.output_dir = os.path.join(args.output_dir, tblname)
 		crud_data.params.modulename = args.modulename
 		dbdesc = build_dbdesc(models_dir)
 		build_crud_ui(crud_data, dbdesc)
