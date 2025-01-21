@@ -102,6 +102,8 @@ def gen(dbdesc, outdir, modulename, txt):
 	gen_update_nodedata(d, outdir)
 	gen_delete_nodedata(d, outdir)
 
+def build_tree_ui(tree_data, dbdesc):
+
 def main(dbdesc, outdir, modulename, fn):
 	with codecs.open(fn, 'r', 'utf-8') as f:
 		gen(dbdesc, outdir, modulename, f.read())
