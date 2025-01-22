@@ -30,9 +30,7 @@ if __name__ == '__main__':
 			tblname = crud_data.alias or crud_data.tblname
 			crud_data.output_dir = os.path.join(args.output_dir, tblname)
 		crud_data.params.modulename = args.modulename
-		if crud_data.uitype == 'tabular':
-			build_crud_ui(crud_data, dbdesc)
-			continue
 		if crud_data.uitype == 'tree':
 			build_tree_ui(crud_data, dbdesc)
 			continue
+		build_crud_ui(crud_data, dbdesc)

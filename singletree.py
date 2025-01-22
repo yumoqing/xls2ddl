@@ -14,6 +14,9 @@ ui_tmpl = """
 {
 	"widgettype":"Tree",
 	"options":{
+{% if toolbar %}
+		"toolbar":{{josn.dumps(toolbar)}},
+{% endif %}
 {% if editable %}
 		"editable":{
 			"fields":{{json.dumps(edit_fields, indent=4)}},
@@ -103,7 +106,27 @@ def gen(dbdesc, outdir, modulename, txt):
 	gen_delete_nodedata(d, outdir)
 
 def build_tree_ui(tree_data, dbdesc):
+	outdir = crud_data.output_dir
+	tbldesc = dbdesc[d.tblname]
+	tbldesc.update(tree_data.params)
+	exclouds = tbldesc.edit_exclouded_fields or []
+	if tbldesc.idField not in exclouds:
+		exclouds.append(tbldesc.idField)
+	if tbldesc.parentField not in exclouds:
+		exclouds.append(tbldesc.parentField)
+	tbldesc.edit_fields = [ f for f in field_list(tbldesc) if f.name not in exclouds ]
+	pat = d.alias or d.tblname
+	_mkdir(outdir)
+	gen_tree_ui(tbldesc, outdir)
+	gen_get_nodedata(tbldesc, outdir)
+	gen_new_nodedata(tbldesc, outdir)
+	gen_update_nodedata(tbldesc, outdir)
+	gen_delete_nodedata(tbldesc, outdir)
 
+def main(dbdesc, outdir, modulename, fn):
+	with codecs.open(fn, 'r', 'utf-8') as f:
+		gen(dbdesc, outdir, modulename, f.read())
+	
 def main(dbdesc, outdir, modulename, fn):
 	with codecs.open(fn, 'r', 'utf-8') as f:
 		gen(dbdesc, outdir, modulename, f.read())
