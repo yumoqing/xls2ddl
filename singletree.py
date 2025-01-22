@@ -14,6 +14,16 @@ ui_tmpl = """
 {
 	"widgettype":"Tree",
 	"options":{
+{% if not notitle %}
+{% if title %}
+		"title":"{{title}}",
+{% else %}
+		"title":"{{summary[0].title}}",
+{% endif %}
+{% endif %}
+{% if description %}
+		"description":"{{description}}",
+{% endif %}
 {% if toolbar %}
 		"toolbar":{{josn.dumps(toolbar)}},
 {% endif %}
