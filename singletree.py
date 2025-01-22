@@ -85,29 +85,12 @@ def gen_get_nodedata(d, pat):
 	with open(os.path.join(pat, f'get_{d.tblname}.dspy'), 'w') as f:
 		f.write(s)
 
-def gen(dbdesc, outdir, modulename, txt):
-	d = DictObject(json.loads(txt))
-	tbldesc = dbdesc[d.tblname]
-	exclouds = d.edit_exclouded_fields or []
-	if d.idField not in exclouds:
-		exclouds.append(d.idField)
-	if d.parentField not in exclouds:
-		exclouds.append(d.parentField)
-	d.update(tbldesc)
-	d.modulename = modulename
-	d.edit_fields = [ f for f in field_list(d) if f.name not in exclouds ]
-	pat = d.alias or d.tblname
-	outdir = os.path.join(outdir, pat)
-	_mkdir(outdir)
-	gen_tree_ui(d, outdir)
-	gen_get_nodedata(d, outdir)
-	gen_new_nodedata(d, outdir)
-	gen_update_nodedata(d, outdir)
-	gen_delete_nodedata(d, outdir)
-
 def build_tree_ui(tree_data, dbdesc):
-	outdir = crud_data.output_dir
-	tbldesc = dbdesc[d.tblname]
+	outdir = tree_data.output_dir
+	_mkdir(outdir)
+	tbldesc = dbdesc[tree_data.tblname].copy()
+	tbldesc = DictObject(**tbldesc)
+	tbldesc.tblname = tree_data.tblname
 	tbldesc.update(tree_data.params)
 	exclouds = tbldesc.edit_exclouded_fields or []
 	if tbldesc.idField not in exclouds:
@@ -115,8 +98,6 @@ def build_tree_ui(tree_data, dbdesc):
 	if tbldesc.parentField not in exclouds:
 		exclouds.append(tbldesc.parentField)
 	tbldesc.edit_fields = [ f for f in field_list(tbldesc) if f.name not in exclouds ]
-	pat = d.alias or d.tblname
-	_mkdir(outdir)
 	gen_tree_ui(tbldesc, outdir)
 	gen_get_nodedata(tbldesc, outdir)
 	gen_new_nodedata(tbldesc, outdir)

@@ -1,4 +1,13 @@
+import os
+import codecs
+import json
+
+import sys
+import argparse
+from appPublic.argsConvert import ArgsConvert
+from appPublic.dictObject import DictObject
 from xls2crud import build_dbdesc, build_crud_ui
+from singletree import build_tree_ui
 if __name__ == '__main__':
 	"""
 	crud_json has following format
@@ -30,6 +39,7 @@ if __name__ == '__main__':
 			tblname = crud_data.alias or crud_data.tblname
 			crud_data.output_dir = os.path.join(args.output_dir, tblname)
 		crud_data.params.modulename = args.modulename
+		crud_data.params.tblname = crud_data.tblname
 		if crud_data.uitype == 'tree':
 			build_tree_ui(crud_data, dbdesc)
 			continue
