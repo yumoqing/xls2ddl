@@ -25,11 +25,11 @@ ui_tmpl = """
 		"description":"{{description}}",
 {% endif %}
 {% if toolbar %}
-		"toolbar":{{josn.dumps(toolbar)}},
+		"toolbar":{{josn.dumps(toolbar, ensure_ascii=False)}},
 {% endif %}
 {% if editable %}
 		"editable":{
-			"fields":{{json.dumps(edit_fields, indent=4)}},
+			"fields":{{json.dumps(edit_fields, indent=4, ensure_ascii=False)}},
 			"add_url":{%- raw -%}"{{entire_url('./new_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"update_url":{%- raw -%}"{{entire_url('./update_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_url":{%- raw -%}"{{entire_url('./delete_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}"{%- endraw %}
@@ -44,7 +44,7 @@ ui_tmpl = """
 		"dataurl":{%- raw -%}"{{entire_url('./get_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}"{%- endraw %}
 	}
 {% if binds %}
-	,"binds":{{json.dumps(binds, indent=4)}}
+	,"binds":{{json.dumps(binds, indent=4, ensure_ascii=False)}}
 {% endif %}
 }
 """
