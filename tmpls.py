@@ -36,12 +36,12 @@ data_browser_tmpl = """
 			"checkField":"{{checkField}}",
 {% endif %}
 {% if browserfields %}
-			"browserfields": {{json.dumps(browserfields, indent=4, ensure_ascii=False)}},
+			"browserfields": {{browserfields|tojson}},
 {% endif %}
 {% if editexclouded %}
 			"editexclouded":{{json.dumps(editexclouded, indent=4, ensure_ascii=False)}},
 {% endif %}
-			"fields":{{json.dumps(fieldlist, indent=4, ensure_ascii=False)}}
+			"fields":{{fieldliststr}}
         },  
 {% if content_view %}
 		"content_view":{{json.dumps(content_view, indent=4, ensure_ascii=False)}},
@@ -49,8 +49,8 @@ data_browser_tmpl = """
         "page_rows":160,
         "cache_limit":5
     }
-{% if binds %}
-	,"binds":{{json.dumps(binds, indent=4, ensure_ascii=False)}}
+{% if bindsstr %}
+	,"binds":{{bindsstr}}
 {% endif %}
 }
 """

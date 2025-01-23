@@ -43,7 +43,7 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
                 "url":"{{entire_url('check_changed.dspy')}}"
             }
         })
-		desc.binds = binds
+		desc.bindsstr = json.dumps(binds, indent=4, ensure_ascii=False)
 	if desc.subtables:
 		if len(desc.subtables) == 1:
 			t = desc.subtables[0]
@@ -224,7 +224,7 @@ from {tables}"""
 	
 def build_data_browser(pat: str, desc: dict):
 	desc = desc.copy()
-	desc.fieldlist = field_list(desc)
+	desc.fieldliststr = json.dumps(field_list(desc), ensure_ascii=False, indent=4)
 	e = MyTemplateEngine([])
 	s = e.renders(data_browser_tmpl, desc)
 	with open(os.path.join(pat, f'index.ui'), 'w') as f:

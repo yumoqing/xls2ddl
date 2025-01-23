@@ -29,7 +29,7 @@ ui_tmpl = """
 {% endif %}
 {% if editable %}
 		"editable":{
-			"fields":{{json.dumps(edit_fields, indent=4, ensure_ascii=False)}},
+			"fields":{{edit_fields_str}},
 			"add_url":{%- raw -%}"{{entire_url('./new_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"update_url":{%- raw -%}"{{entire_url('./update_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_url":{%- raw -%}"{{entire_url('./delete_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}"{%- endraw %}
@@ -107,7 +107,8 @@ def build_tree_ui(tree_data, dbdesc):
 		exclouds.append(tbldesc.idField)
 	if tbldesc.parentField not in exclouds:
 		exclouds.append(tbldesc.parentField)
-	tbldesc.edit_fields = [ f for f in field_list(tbldesc) if f.name not in exclouds ]
+	tbldesc.edit_fields_str = json.dumps([ f for f in field_list(tbldesc) if f.name not in exclouds ],
+							indent=4, ensure_ascii=False)
 	gen_tree_ui(tbldesc, outdir)
 	gen_get_nodedata(tbldesc, outdir)
 	gen_new_nodedata(tbldesc, outdir)
