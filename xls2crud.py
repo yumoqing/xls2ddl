@@ -28,7 +28,6 @@ def build_dbdesc(models_dir: str) -> dict:
 def build_crud_ui(crud_data: dict, dbdesc: dict):
 	uidir = crud_data.output_dir
 	tables = [ k for k in dbdesc.keys() ]
-	print(f'write to {uidir},{tables=}')
 	desc = dbdesc[crud_data.tblname]
 	desc.update(crud_data.params)
 	if desc.relation:
@@ -44,10 +43,10 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
                 "url":"{{entire_url('check_changed.dspy')}}"
             }
         })
-		desc.binds = binds
-	if crud_data.params.subtables:
-		if len(crud_data.params.subtables) == 1:
-			t = crud_data.params.subtables[0]
+		desc.bindsstr = json.dumps(binds, indent=4, ensure_ascii=False)
+	if desc.subtables:
+		if len(desc.subtables) == 1:
+			t = desc.subtables[0]
 			url = f"../{t.subtable}"
 			if t.url:
 				url = t.url
@@ -63,7 +62,7 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 			})
 		else:
 			items = []
-			for t in crud_data.params.subtables:
+			for t in desc.subtables:
 				url = f"../{t.subtable}"
 				if t.url:
 					url = t.url
@@ -103,7 +102,6 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 
 def build_table_crud_ui(uidir: str, desc: dict) -> None:
 	_mkdir(uidir)
-	# print('table_desc=', desc)
 	build_data_browser(uidir, desc)
 	if desc.relation:
 		build_check_changed(uidir, desc)
@@ -199,7 +197,6 @@ def construct_get_data_sql(desc: dict) -> str:
 	shortnames = [c for c in 'bcdefghjklmnopqrstuvwxyz']
 	infos = []
 	if desc.relation and desc.codes:
-		print('============')
 		param_field = "${" + desc.relation.param_field + "}$"
 		for code in desc.codes:
 			if code.field == desc.relation.outter_field:
@@ -211,8 +208,6 @@ from {code.table} a left join
 (select * from {desc.tblname} where {desc.relation.param_field} ={param_field}) b 
 	on a.{code.valuefield} = b.{code.field}
 """
-	else:
-		print('===== not ======', desc.relation, 'codes=', desc.codes)
 	if not desc.codes or len(desc.codes) == 0:
 		return f"select * from {desc.tblname} where 1=1 " + '{}'
 
@@ -233,9 +228,8 @@ from {tables}"""
 
 	
 def build_data_browser(pat: str, desc: dict):
-	# print(desc)
 	desc = desc.copy()
-	desc.fieldlist = field_list(desc)
+	desc.fieldliststr = json.dumps(field_list(desc), ensure_ascii=False, indent=4)
 	e = MyTemplateEngine([])
 	s = e.renders(data_browser_tmpl, desc)
 	with open(os.path.join(pat, f'index.ui'), 'w') as f:
@@ -294,7 +288,6 @@ if __name__ == '__main__':
 	if len(args.files) < 1:
 		print(f'Usage:\n{sys.argv[0]} [-m models_dir] [-o output_dir] json_file ....\n')
 		sys.exit(1)
-	print(args)
 	ns = {k:v for k, v in os.environ.items()}
 	for fn in args.files:
 		print(f'handle {fn}')

@@ -14,9 +14,22 @@ ui_tmpl = """
 {
 	"widgettype":"Tree",
 	"options":{
+{% if not notitle %}
+{% if title %}
+		"title":"{{title}}",
+{% else %}
+		"title":"{{summary[0].title}}",
+{% endif %}
+{% endif %}
+{% if description %}
+		"description":"{{description}}",
+{% endif %}
+{% if toolbar %}
+		"toolbar":{{josn.dumps(toolbar, ensure_ascii=False)}},
+{% endif %}
 {% if editable %}
 		"editable":{
-			"fields":{{json.dumps(edit_fields, indent=4)}},
+			"fields":{{edit_fields_str}},
 			"add_url":{%- raw -%}"{{entire_url('./new_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"update_url":{%- raw -%}"{{entire_url('./update_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}",{%- endraw %}
 			"delete_url":{%- raw -%}"{{entire_url('./delete_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}"{%- endraw %}
@@ -31,7 +44,7 @@ ui_tmpl = """
 		"dataurl":{%- raw -%}"{{entire_url('./get_{%- endraw -%}{{tblname}}{%- raw -%}.dspy')}}"{%- endraw %}
 	}
 {% if binds %}
-	,"binds":{{json.dumps(binds, indent=4)}}
+	,"binds":{{json.dumps(binds, indent=4, ensure_ascii=False)}}
 {% endif %}
 }
 """
@@ -82,26 +95,30 @@ def gen_get_nodedata(d, pat):
 	with open(os.path.join(pat, f'get_{d.tblname}.dspy'), 'w') as f:
 		f.write(s)
 
-def gen(dbdesc, outdir, modulename, txt):
-	d = DictObject(json.loads(txt))
-	tbldesc = dbdesc[d.tblname]
-	exclouds = d.edit_exclouded_fields or []
-	if d.idField not in exclouds:
-		exclouds.append(d.idField)
-	if d.parentField not in exclouds:
-		exclouds.append(d.parentField)
-	d.update(tbldesc)
-	d.modulename = modulename
-	d.edit_fields = [ f for f in field_list(d) if f.name not in exclouds ]
-	pat = d.alias or d.tblname
-	outdir = os.path.join(outdir, pat)
+def build_tree_ui(tree_data, dbdesc):
+	outdir = tree_data.output_dir
 	_mkdir(outdir)
-	gen_tree_ui(d, outdir)
-	gen_get_nodedata(d, outdir)
-	gen_new_nodedata(d, outdir)
-	gen_update_nodedata(d, outdir)
-	gen_delete_nodedata(d, outdir)
+	tbldesc = dbdesc[tree_data.tblname].copy()
+	tbldesc = DictObject(**tbldesc)
+	tbldesc.tblname = tree_data.tblname
+	tbldesc.update(tree_data.params)
+	exclouds = tbldesc.edit_exclouded_fields or []
+	if tbldesc.idField not in exclouds:
+		exclouds.append(tbldesc.idField)
+	if tbldesc.parentField not in exclouds:
+		exclouds.append(tbldesc.parentField)
+	tbldesc.edit_fields_str = json.dumps([ f for f in field_list(tbldesc) if f.name not in exclouds ],
+							indent=4, ensure_ascii=False)
+	gen_tree_ui(tbldesc, outdir)
+	gen_get_nodedata(tbldesc, outdir)
+	gen_new_nodedata(tbldesc, outdir)
+	gen_update_nodedata(tbldesc, outdir)
+	gen_delete_nodedata(tbldesc, outdir)
 
+def main(dbdesc, outdir, modulename, fn):
+	with codecs.open(fn, 'r', 'utf-8') as f:
+		gen(dbdesc, outdir, modulename, f.read())
+	
 def main(dbdesc, outdir, modulename, fn):
 	with codecs.open(fn, 'r', 'utf-8') as f:
 		gen(dbdesc, outdir, modulename, f.read())
