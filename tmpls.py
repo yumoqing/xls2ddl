@@ -134,6 +134,10 @@ id = params_kw.id
 if not id or len(id) > 32:
 	id = uuid()
 ns['id'] = id
+{% for f in confidential_fields or [] %}
+if params_kw.get('{{f}}'):
+	ns['{{f}}'] = password(params_kw.get('{{f}}'))
+{% endfor %}
 {% if logined_userid %}
 userid = await get_user()
 if not userid:
@@ -223,6 +227,11 @@ if not userorgid:
 	}
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
+{% for f in confidential_fields or [] %}
+if params_kw.get('{{f}}'):
+    ns['{{f}}'] = password(params_kw.get('{{f}}'))
+{% endfor %}
+
 db = DBPools()
 dbname = await rfexe('get_module_dbname', '{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
