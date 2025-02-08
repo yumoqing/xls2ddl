@@ -48,6 +48,8 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 		if len(desc.subtables) == 1:
 			t = desc.subtables[0]
 			url = f"../{t.subtable}"
+			if t.url:
+				url = t.url
 			content_view = DictObject(**{
 	            "widgettype":"urlwidget",
 				"options":{
@@ -62,6 +64,9 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
 			items = []
 			for t in desc.subtables:
 				url = f"../{t.subtable}"
+				if t.url:
+					url = t.url
+
 				item = {
 					"name":t.subtable,
 					"label":t.title or t.subtable,
