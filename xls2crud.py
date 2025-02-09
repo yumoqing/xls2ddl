@@ -175,6 +175,8 @@ def setup_ui_info(field:dict) ->dict:
 	elif d.type in ['int', 'short', 'long', 'longlong']:
 		d.uitype = 'int'
 		d.length = 0
+	elif d.type == 'text':
+		d.uitype = 'text'
 	elif d.type in ['float', 'double', 'decimal']:
 		d.uitype = 'float'
 	else:
@@ -184,11 +186,7 @@ def setup_ui_info(field:dict) ->dict:
 		elif d.name in ['password', 'passwd']:
 			d.uitype = 'password'
 		else:
-			if d.type=='str' and d.length > 100:
-				d.uitype = 'text'
-				d.rows = 4
-			else:
-				d.uitype = 'str'
+			d.uitype = 'str'
 	d.datatype = d.type
 	d.label = d.title or d.name
 	return d
