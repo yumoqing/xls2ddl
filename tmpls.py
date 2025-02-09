@@ -86,7 +86,7 @@ if not userorgid:
 	}
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
-print(f'get_{{tblname}}.dspy:{ns=}')
+debug(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
     ns['page'] = 1 
 if not ns.get('sort'):
@@ -236,7 +236,7 @@ db = DBPools()
 dbname = await rfexe('get_module_dbname', '{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
     r = await sor.U('{{summary[0].name}}', ns)
-    print('update success');
+    debug('update success');
     return {
         "widgettype":"Message",
         "options":{
@@ -297,7 +297,7 @@ db = DBPools()
 dbname = await rfexe('get_module_dbname', '{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
     r = await sor.D('{{summary[0].name}}', ns)
-    print('delete success');
+    debug('delete success');
     return {
         "widgettype":"Message",
         "options":{
@@ -309,7 +309,7 @@ async with db.sqlorContext(dbname) as sor:
         }
     }
 
-print('Delete failed');
+debug('Delete failed');
 return {
     "widgettype":"Error",
     "options":{
@@ -324,7 +324,7 @@ return {
 
 check_changed_tmpls = """
 is_checked = params_kw.get('has_{{relation.param_field}}')
-print(params_kw, is_checked)
+debug(params_kw, is_checked)
 dbname = await rfexe('get_module_dbname','{{modulename}}')
 if is_checked == 'true':
     ns = {

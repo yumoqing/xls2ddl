@@ -205,11 +205,11 @@ case when b.{desc.relation.param_field} is NULL then 0 else 1 end has_{desc.rela
 a.{code.valuefield} as {code.field}, 
 a.{code.textfield} as {code.field}_text
 from {code.table} a left join 
-(select * from {desc.tblname} where {desc.relation.param_field} ={param_field}) b 
+(select * from {desc.tblsql or desc.tblname} where {desc.relation.param_field} ={param_field}) b 
 	on a.{code.valuefield} = b.{code.field}
 """
 	if not desc.codes or len(desc.codes) == 0:
-		return f"select * from {desc.tblname} where 1=1 " + '{}'
+		return f"select * from {desc.tblsql or desc.tblname} where 1=1 " + '{}'
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
