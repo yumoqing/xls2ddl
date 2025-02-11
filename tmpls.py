@@ -136,7 +136,7 @@ if not id or len(id) > 32:
 ns['id'] = id
 {% for f in confidential_fields or [] %}
 if params_kw.get('{{f}}'):
-	ns['{{f}}'] = password(params_kw.get('{{f}}'))
+	ns['{{f}}'] = password_encode(params_kw.get('{{f}}'))
 {% endfor %}
 {% if logined_userid %}
 userid = await get_user()
@@ -229,7 +229,7 @@ ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 {% for f in confidential_fields or [] %}
 if params_kw.get('{{f}}'):
-    ns['{{f}}'] = password(params_kw.get('{{f}}'))
+    ns['{{f}}'] = password_encode(params_kw.get('{{f}}'))
 {% endfor %}
 
 db = DBPools()
