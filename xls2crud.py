@@ -207,7 +207,7 @@ from {code.table} a left join
 	on a.{code.valuefield} = b.{code.field}
 """
 	if not desc.codes or len(desc.codes) == 0:
-		return f"select * from {desc.tblsql or desc.tblname} where 1=1 " + '{}'
+		return f"select * from {desc.tblsql or desc.tblname} where 1=1 " + ' {filterstr}'
 
 	for i, c in enumerate(desc.codes):
 		shortname = shortnames[i]
@@ -217,7 +217,7 @@ from {code.table} a left join
 		csql = f"""(select {c.valuefield} as {c.field}, 
 			{c.textfield} as {c.field}_text from {c.table} where {cond})"""
 		infos.append([f'{shortname}.{c.field}_text', f"{csql} {shortname} on a.{c.field} = {shortname}.{c.field}"])
-	bt = f'(select * from {desc.summary[0].name} where 1=1' + "{}) a"
+	bt = f'(select * from {desc.summary[0].name} where 1=1' + " {filterstr}) a"
 	infos.insert(0, ['a.*', bt]) 
 	fields = ', '.join([i[0] for i in infos])
 	tables = ' left join '.join([i[1] for i in infos])

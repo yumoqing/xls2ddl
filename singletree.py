@@ -57,6 +57,7 @@ if id:
 else:
 	sql += " and {{parentField}} is null"
 
+sql += " order by {{textField}} "
 db = DBPools()
 dbname = await rfexe('get_module_dbname','{{modulename or ''}}')
 async with db.sqlorContext(dbname) as sor:

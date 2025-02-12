@@ -1,0 +1,19 @@
+{
+    "tblname": "userrole",
+	"title":"用户角色",
+    "params": {
+		"relation":{
+			"param_field":"userid",
+			"outter_field":"roleid"
+		},
+        "browserfields": {
+            "exclouded": ["id", "userid"],
+            "alters": {}
+        },
+        "editexclouded": [
+            "id",
+			"userid"
+        ],
+        "record_toolbar": null
+    }
+}

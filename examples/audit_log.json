@@ -1,0 +1,14 @@
+{
+    "tblname": "audit_log",
+	"title":"审计日志",
+    "params": {
+		"sortby":"userid",
+        "browserfields": {
+            "exclouded": ["id"],
+            "cwidth": {}
+        },
+        "editexclouded": [
+            "id"
+        ]
+    }
+}

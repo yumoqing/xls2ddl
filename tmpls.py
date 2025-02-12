@@ -108,14 +108,19 @@ filterjson = params_kw.get('data_filter')
 if not filterjson:
 	fields = [ f['name'] for f in {{json.dumps(fields, indent=4, ensure_ascii=False)}} ]
 	filterjson = default_filterjson(fields, ns)
+filterdic = {
+	'filterstr':'',
+	'userid':userid,
+	'userorgid':userorgid
+}
 if filterjson:
 	dbf = DBFilter(filterjson)
 	conds = dbf.gen(ns)
 	if conds:
 		ns.update(dbf.consts)
-		sql = sql.format(' and ' + conds)
-else:
-	sql = sql.format('')
+		conds = f' and {conds}'
+		filterdic['filterstr'] = conds
+sql = sql.format(filterdic)
 {% endif %}
 debug(f'{sql=}')
 db = DBPools()
@@ -324,7 +329,7 @@ return {
 
 check_changed_tmpls = """
 is_checked = params_kw.get('has_{{relation.param_field}}')
-debug(params_kw, is_checked)
+debug(f'{params_kw=}, {is_checked=}')
 dbname = await rfexe('get_module_dbname','{{modulename}}')
 if is_checked == 'true':
     ns = {

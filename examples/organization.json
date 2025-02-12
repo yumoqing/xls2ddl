@@ -1,0 +1,32 @@
+{
+    "models_dir": "${HOME}$/py/rbac/models",
+    "output_dir": "${HOME}$/py/sage/wwwroot/_a/organization",
+    "dbname": "sage",
+    "tblname": "organization",
+	"title":"Organization",
+    "params": {
+		"sortby":"orgname",
+        "browserfields": {
+            "exclouded": ["id"],
+            "cwidth": {}
+        },
+        "editexclouded": [
+            "id"
+        ],
+		"subtables":[
+			{
+				"field":"orgid",
+				"title":"Org. type",
+				"url":"../orgtypes",
+				"subtable":"orgtypes"
+			},
+			{
+				"field":"orgid",
+				"title":"Users",
+				"url":"../users",
+				"subtable":"users"
+			}
+		],
+        "record_toolbar": null
+    }
+}
