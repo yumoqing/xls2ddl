@@ -108,11 +108,8 @@ filterjson = params_kw.get('data_filter')
 if not filterjson:
 	fields = [ f['name'] for f in {{json.dumps(fields, indent=4, ensure_ascii=False)}} ]
 	filterjson = default_filterjson(fields, ns)
-filterdic = {
-	'filterstr':'',
-	'userid':userid,
-	'userorgid':userorgid
-}
+filterdic = ns.copy()
+filterdic['filterstr's] = ''
 if filterjson:
 	dbf = DBFilter(filterjson)
 	conds = dbf.gen(ns)
@@ -120,7 +117,7 @@ if filterjson:
 		ns.update(dbf.consts)
 		conds = f' and {conds}'
 		filterdic['filterstr'] = conds
-sql = sql.format(filterdic)
+sql = sql.format(**filterdic)
 {% endif %}
 debug(f'{sql=}')
 db = DBPools()
