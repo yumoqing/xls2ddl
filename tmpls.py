@@ -36,7 +36,7 @@ data_browser_tmpl = """
 			"checkField":"{{checkField}}",
 {% endif %}
 {% if browserfields %}
-			"browserfields": {{browserfields|tojson}},
+			"browserfields": {{json.dumps(browserfields, indent=4, ensure_ascii=Fasle)}},
 {% endif %}
 {% if editexclouded %}
 			"editexclouded":{{json.dumps(editexclouded, indent=4, ensure_ascii=False)}},
@@ -70,6 +70,7 @@ if not userid:
 		}
 	}
 ns['{{logined_userid}}'] = userid
+ns['userid'] = userid
 {% endif %}
 {% if logined_userorgid %}
 userorgid = await get_userorgid()
@@ -85,6 +86,7 @@ if not userorgid:
 		}
 	}
 ns['{{logined_userorgid}}'] = userorgid
+ns['userorgid'] = userorgid
 {% endif %}
 debug(f'get_{{tblname}}.dspy:{ns=}')
 if not ns.get('page'):
@@ -109,7 +111,9 @@ if not filterjson:
 	fields = [ f['name'] for f in {{json.dumps(fields, indent=4, ensure_ascii=False)}} ]
 	filterjson = default_filterjson(fields, ns)
 filterdic = ns.copy()
-filterdic['filterstr's] = ''
+filterdic['filterstr'] = ''
+filterdic['userorgid'] = '${userorgid}$'
+filterdic['userid'] = '${userid}$'
 if filterjson:
 	dbf = DBFilter(filterjson)
 	conds = dbf.gen(ns)

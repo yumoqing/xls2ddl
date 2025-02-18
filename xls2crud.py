@@ -19,6 +19,7 @@ xls2crud.py dbname models_dir uidir
 def build_dbdesc(models_dir: str) -> dict:
 	db_desc = {}
 	for f in listFile(models_dir, suffixs=['.xlsx']):
+		print(f'{f} handle ...')
 		x = xlsxFactory(f)
 		d = x.get_data()
 		tbname = d.summary[0].name
