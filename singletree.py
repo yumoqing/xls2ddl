@@ -25,7 +25,7 @@ ui_tmpl = """
 		"description":"{{description}}",
 {% endif %}
 {% if toolbar %}
-		"toolbar":{{josn.dumps(toolbar, ensure_ascii=False)}},
+		"toolbar":{{json.dumps(toolbar, ensure_ascii=False)}},
 {% endif %}
 {% if editable %}
 		"editable":{

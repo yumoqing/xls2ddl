@@ -121,7 +121,11 @@ if filterjson:
 		ns.update(dbf.consts)
 		conds = f' and {conds}'
 		filterdic['filterstr'] = conds
-sql = sql.format(**filterdic)
+ac = ArgsConvert('[[', ']]')
+vars = ac.findAllVariables(sql)
+NameSpace = {v:'${' + v + '}$' for v in vars if v != 'filterstr' }
+filterdic.update(NameSpace)
+sql = ac.convert(sql, filterdic)
 {% endif %}
 debug(f'{sql=}')
 db = DBPools()
