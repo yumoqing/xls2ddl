@@ -26,14 +26,29 @@ def build_dbdesc(models_dir: str) -> dict:
 		db_desc.update({tbname:d})
 	return db_desc
 
+def build_subtable(subtable):
+	t = subtable
+	url = f"../{t.subtable}"
+	if t.url:
+		url = t.url
+	params = t.params or {}
+	params[t.field] = "${id}"
+	return {
+		"widgettype":"urlwidget",
+		"options":{
+			"params":params,
+			"url":"{{entire_url('" + url + "')}}"
+		}   
+	}
+
 def build_crud_ui(crud_data: dict, dbdesc: dict):
 	uidir = crud_data.output_dir
 	tables = [ k for k in dbdesc.keys() ]
 	desc = dbdesc[crud_data.tblname]
 	desc.update(crud_data.params)
+	binds = desc.binds or []
 	if desc.relation:
 		desc.checkField = 'has_' + desc.relation.param_field 
-		binds = desc.binds or []
 		binds.append({
             "wid":"self",
             "event":"row_check_changed",
@@ -44,43 +59,20 @@ def build_crud_ui(crud_data: dict, dbdesc: dict):
                 "url":"{{entire_url('check_changed.dspy')}}"
             }
         })
-		desc.bindsstr = json.dumps(binds, indent=4, ensure_ascii=False)
+	desc.bindsstr = json.dumps(binds, indent=4, ensure_ascii=False)
 	if desc.subtables:
 		if len(desc.subtables) == 1:
 			t = desc.subtables[0]
-			url = f"../{t.subtable}"
-			if t.url:
-				url = t.url
-			content_view = DictObject(**{
-	            "widgettype":"urlwidget",
-				"options":{
-					"params":{
-						"oops":1,
-						f"{t.field}":"${id}"
-					},  
-					"url":"{{entire_url('" + url + "')}}"
-				}   
-			})
+			d = build_subtable(t)
+			content_view = DictObject(**d)
 		else:
 			items = []
 			for t in desc.subtables:
-				url = f"../{t.subtable}"
-				if t.url:
-					url = t.url
-
+				d = build_subtable(t)
 				item = {
 					"name":t.subtable,
 					"label":t.title or t.subtable,
-					"content":{
-						"widgettype":"urlwidget",
-						"options":{
-							"params":{
-								"oops":1,
-								f"{t.field}":"${id}"
-							},  
-							"url":"{{entire_url('" + url + "')}}"
-						}   
-					}   
+					"content":d
 				}
 				items.append(item)
 			content_view = DictObject(**{
@@ -154,6 +146,10 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			}
 			if c.cond:
 				d.params['cond'] = c.cond
+				ac = ArgsConvert('[[', ']]')
+				vars = ac.findAllVariables(c.cond)
+				for v in vars:
+					d.params[v] = '{{params_kw.' + v + '}}'
 			d.dataurl = "{{entire_url('/appbase/get_code.dspy')}}"
 			return d
 	return None

@@ -43,8 +43,14 @@ data_browser_tmpl = """
 {% endif %}
 			"fields":{{fieldliststr}}
         },  
+{% if subtables_condition %}
+{%- raw -%}{% {%- endraw %}if {{subtables_condition}} {%- raw -%} %}{%- endraw -%}
+{% endif %}
 {% if content_view %}
 		"content_view":{{json.dumps(content_view, indent=4, ensure_ascii=False)}},
+{% endif %}
+{% if subtables_condition %}
+{%- raw -%}{% endif %}{%- endraw %}
 {% endif %}
         "page_rows":160,
         "cache_limit":5
