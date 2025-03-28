@@ -154,7 +154,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			return d
 	return None
 
-def setup_ui_info(field:dict) ->dict:
+def setup_ui_info(field:dict, confidential_fields) ->dict:
 	d = DictObject(**field.copy())
 	if d.length:
 		d.cwidth = d.length if d.length < 18 else 18
@@ -177,11 +177,11 @@ def setup_ui_info(field:dict) ->dict:
 	elif d.type in ['float', 'double', 'decimal']:
 		d.uitype = 'float'
 	else:
-		if d.name.endswith('_date') or d.name.endswith('_dat'):
+		if d.name in confidential_fields:
+			d.uitype = 'password'
+		elif d.name.endswith('_date') or d.name.endswith('_dat'):
 			d.uitype = 'date'
 			d.length = 0
-		elif d.name in ['password', 'passwd']:
-			d.uitype = 'password'
 		else:
 			d.uitype = 'str'
 	d.datatype = d.type
