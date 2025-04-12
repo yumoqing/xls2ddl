@@ -59,7 +59,7 @@ else:
 
 sql += " order by {{textField}} "
 db = DBPools()
-dbname = await rfexe('get_module_dbname','{{modulename or ''}}')
+dbname = get_module_dbname('{{modulename or ''}}')
 async with db.sqlorContext(dbname) as sor:
 	r = await sor.sqlExe(sql, ns)
 	return r

@@ -135,7 +135,7 @@ sql = ac.convert(sql, filterdic)
 {% endif %}
 debug(f'{sql=}')
 db = DBPools()
-dbname = await rfexe('get_module_dbname', '{{modulename}}')
+dbname = get_module_dbname('{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
     r = await sor.sqlPaging(sql, ns) 
     return r
@@ -185,7 +185,7 @@ if not userorgid:
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
-dbname = await rfexe('get_module_dbname', '{{modulename}}')
+dbname = get_module_dbname('{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
     r = await sor.C('{{summary[0].name}}', ns.copy())
     return {
@@ -249,7 +249,7 @@ if params_kw.get('{{f}}'):
 {% endfor %}
 
 db = DBPools()
-dbname = await rfexe('get_module_dbname', '{{modulename}}')
+dbname = get_module_dbname('{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
     r = await sor.U('{{summary[0].name}}', ns)
     debug('update success');
@@ -310,7 +310,7 @@ if not userorgid:
 ns['{{logined_userorgid}}'] = userorgid
 {% endif %}
 db = DBPools()
-dbname = await rfexe('get_module_dbname', '{{modulename}}')
+dbname = get_module_dbname('{{modulename}}')
 async with db.sqlorContext(dbname) as sor:
     r = await sor.D('{{summary[0].name}}', ns)
     debug('delete success');
@@ -341,7 +341,7 @@ return {
 check_changed_tmpls = """
 is_checked = params_kw.get('has_{{relation.param_field}}')
 debug(f'{params_kw=}, {is_checked=}')
-dbname = await rfexe('get_module_dbname','{{modulename}}')
+dbname = get_module_dbname('{{modulename}}')
 if is_checked == 'true':
     ns = {
         "id":uuid(),

@@ -118,7 +118,7 @@ def field_list(desc: dict) -> list:
 		if desc.codes and f.name in [c.field for c in desc.codes]:
 			d = get_code_desc(f, desc)
 		else:
-			d = setup_ui_info(f)
+			d = setup_ui_info(f, confidential_fields=desc.confidential_fields or [])
 		"""
 		use alters to modify fields
 		"""
@@ -137,7 +137,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			d.valueField = d.name
 			d.textField = d.name + '_text'
 			d.params = {
-				'dbname':"{{rfexe('get_module_dbname', '" + desc.modulename + "')}}",
+				'dbname':"{{get_module_dbname(', '" + desc.modulename + "')}}",
 				'table':c.table,
 				'tblvalue':c.valuefield,
 				'tbltext':c.textfield,
@@ -154,7 +154,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			return d
 	return None
 
-def setup_ui_info(field:dict, confidential_fields) ->dict:
+def setup_ui_info(field:dict, confidential_fields=[]) ->dict:
 	d = DictObject(**field.copy())
 	if d.length:
 		d.cwidth = d.length if d.length < 18 else 18
