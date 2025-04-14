@@ -137,7 +137,7 @@ def get_code_desc(field: dict, desc: dict) -> dict:
 			d.valueField = d.name
 			d.textField = d.name + '_text'
 			d.params = {
-				'dbname':"{{get_module_dbname(', '" + desc.modulename + "')}}",
+				'dbname':"{{get_module_dbname('" + desc.modulename + "')}}",
 				'table':c.table,
 				'tblvalue':c.valuefield,
 				'tbltext':c.textfield,
